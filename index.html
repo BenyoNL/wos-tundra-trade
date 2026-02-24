@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whiteout Survival - Tundra Album Csere</title>
+    <title>Whiteout Survival - Tundra Trade</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background-color: #f4f7f6; }
         .container { background: white; max-width: 800px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px;}
+        input, select { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px;}
         .btn { padding: 10px 20px; margin: 5px 0; font-size: 16px; cursor: pointer; color: white; border: none; border-radius: 5px; font-weight: bold; width: 90%; }
         .btn-blue { background-color: #4285F4; } .btn-blue:hover { background-color: #357ae8; }
         .btn-green { background-color: #28a745; } .btn-green:hover { background-color: #218838; }
@@ -22,19 +22,27 @@
         .search-item { background: #17a2b8; color: white; text-align: left; padding: 10px 15px; }
         .search-item span { display: block; font-size: 12px; color: #eef2f5; font-weight: normal; }
 
-        #search-bar { position: sticky; top: 0; background: white; padding: 10px 0; z-index: 10; border-bottom: 2px solid #eee; margin-bottom: 15px;}
-        .action-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
+        #top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        #lang-selector { width: auto; padding: 5px; margin: 0; font-size: 14px;}
         
-        .puzzle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 10px; }
-        .puzzle-piece { border-radius: 8px; padding: 5px; background: #5a82e6; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 100px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        .action-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
+        #search-bar { position: sticky; top: 0; background: white; padding: 10px 0; z-index: 10; border-bottom: 2px solid #eee; margin-bottom: 15px;}
+        
+        .puzzle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 10px; }
+        
+        /* Keyboard focus style for puzzle pieces */
+        .puzzle-piece { border-radius: 8px; padding: 5px; background: #5a82e6; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 100px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); outline: none; transition: transform 0.1s;}
+        .puzzle-piece:focus { border: 3px solid #ffc107; transform: scale(1.05); }
+        
         .piece-shape { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; margin-bottom: 5px;}
         
         .controls { display: flex; align-items: center; justify-content: space-between; width: 100%; background: white; border-radius: 5px; overflow: hidden; }
         .qty-btn { background: #ddd; border: none; padding: 5px 10px; cursor: pointer; font-weight: bold; font-size: 14px; }
         .qty-btn.plus { background: #6bc85f; color: white; }
         .qty-btn.minus { background: #d9534f; color: white; }
-        .qty-display { font-weight: bold; color: #333; font-size: 14px;}
+        .qty-display { font-weight: bold; color: #333; font-size: 16px;}
         .piece-missing { background: #8892a3; }
+        .piece-surplus { background: #28a745; } /* Zöldebb, ha van felesleg */
         
         #toast-msg {
             visibility: hidden; min-width: 250px; background-color: rgba(40, 167, 69, 0.95);
@@ -53,43 +61,54 @@
 </head>
 <body>
 
-    <div id="toast-msg">✅ Sikeres mentés!</div>
+    <div id="toast-msg">✅ Saved!</div>
 
     <div id="auth-screen" class="container">
-        <h2>Lépj be vagy Regisztrálj</h2>
-        <input type="email" id="email-input" placeholder="E-mail cím">
-        <input type="password" id="password-input" placeholder="Jelszó">
-        <div id="auth-error" style="color:red"></div>
-        <button id="email-login-btn" class="btn btn-green">Belépés E-maillel</button>
-        <button id="email-register-btn" class="btn btn-dark">Új fiók regisztrálása</button>
-        <hr><button id="google-login-btn" class="btn btn-blue">Belépés Google fiókkal</button>
+        <h2>Login or Register</h2>
+        <input type="email" id="email-input" placeholder="Email address">
+        <input type="password" id="password-input" placeholder="Password">
+        <div id="auth-error" style="color:red; margin-bottom:10px;"></div>
+        <button id="email-login-btn" class="btn btn-green">Login with Email</button>
+        <button id="email-register-btn" class="btn btn-dark">Register new account</button>
+        <hr><button id="google-login-btn" class="btn btn-blue">Login with Google</button>
     </div>
 
     <div id="profile-setup-screen" class="container" style="display: none;">
-        <h2>Hozd létre a profilod</h2>
-        <input type="text" id="player-name" placeholder="Játékosneved">
-        <input type="number" id="server-number" placeholder="Szerver száma (Állam)">
-        <input type="text" id="alliance-name" placeholder="Szövetség rövidítése">
-        <div id="profile-error" style="color:red"></div>
-        <button id="save-profile-btn" class="btn btn-green">Mentés és Tovább</button>
+        <h2>Setup your profile</h2>
+        <input type="text" id="player-name" placeholder="Player Name (any characters)">
+        <input type="number" id="server-number" placeholder="State/Server (exactly 4 digits, e.g., 2530)">
+        <input type="text" id="alliance-name" placeholder="Alliance Tag (exactly 3 chars, e.g., ABC)">
+        <div id="profile-error" style="color:red; margin-bottom:10px;"></div>
+        <button id="save-profile-btn" class="btn btn-green">Save & Continue</button>
     </div>
 
     <div id="main-app-screen" class="container" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        
+        <div id="top-bar">
             <div style="text-align: left;">
                 <h3 style="margin: 0; color:#4285F4;" id="display-name"></h3>
-                <small>Állam: <b id="display-server"></b> | Klán: <b id="display-alliance"></b></small>
+                <small><span class="t-state">State</span>: <b id="display-server"></b> | <span class="t-alliance">Alliance</span>: <b id="display-alliance"></b></small>
             </div>
-            <button id="logout-btn" class="btn btn-red" style="width: auto; padding: 5px 10px;">Kilépés</button>
+            <div>
+                <select id="lang-selector" onchange="changeLanguage(this.value)">
+                    <option value="en" selected>🇬🇧 English</option>
+                    <option value="hu">🇭🇺 Magyar</option>
+                    <option value="de">🇩🇪 Deutsch</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="tr">🇹🇷 Türkçe</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                </select>
+            </div>
         </div>
         
         <div class="action-buttons">
-            <button onclick="runMatchmaker('alliance')" class="btn btn-dark" style="width: 48%;">🤝 Keresés Klánban</button>
-            <button onclick="runMatchmaker('state')" class="btn btn-dark" style="width: 48%;">🌍 Keresés Államban</button>
+            <button onclick="runMatchmaker('alliance')" class="btn btn-dark t-btn-clan" style="width: 48%;">🤝 Search in Clan</button>
+            <button onclick="runMatchmaker('state')" class="btn btn-dark t-btn-state" style="width: 48%;">🌍 Search in State</button>
         </div>
 
         <div id="search-bar">
-            <input type="text" id="search-input" placeholder="🔍 Keresés albumra vagy kártyára...">
+            <input type="text" id="search-input" class="t-search-ph" placeholder="🔍 Search album or card...">
         </div>
 
         <div id="view-albums"></div>
@@ -99,17 +118,18 @@
         <div id="view-matchmaker" style="display: none;"></div>
 
         <br><hr><br>
-        <button id="save-inventory-btn" class="btn btn-green" style="font-size: 18px; padding: 15px;">💾 Változások Mentése</button>
+        <button id="save-inventory-btn" class="btn btn-green t-btn-save" style="font-size: 18px; padding: 15px;">💾 Save Changes</button>
+        <br><br>
+        <button id="logout-btn" class="btn btn-red t-btn-logout" style="width: auto;">Logout</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        // ÚJ import: increment - ezzel tudjuk a háttérben növelni/csökkenteni a számokat!
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // IDE MÁSOLD BE A SAJÁT KULCSODAT!
-const firebaseConfig = {
+        // MÁSOLD BE A SAJÁT KULCSODAT!
+        const firebaseConfig = {
   apiKey: "AIzaSyDeEK5nOuvuELtGd61Q7W04uKGcJqG1L1U",
   authDomain: "tundra-album.firebaseapp.com",
   projectId: "tundra-album",
@@ -126,25 +146,46 @@ const firebaseConfig = {
 
         let currentUserUid = null;
         let userInventory = {}; 
+        let currentAlbumGlobal = null;
+        let currentCardGlobal = null;
 
-        const albumNames = [
-            "Rekindled Flames", "Explore the World", "Daybreak Island", "Tundra Alliance", 
-            "Battlefield Epic", "Spectacular Adventures", "Divine Weapons", "Song of Heroes", 
-            "The Labyrinth", "Nature’s Strength", "Crystalline Mysteries", "Ballad of Wind and Cold", 
-            "Infernal Power", "Prerogative of the Flame", "Frostdragon Empire", "Kings of Combat"
-        ];
-        
+        // --- DICTIONARY (Fordítások) ---
+        const i18n = {
+            en: { state: "State", alliance: "Alliance", btnClan: "🤝 Search in Clan", btnState: "🌍 Search in State", searchPh: "🔍 Search album or card...", btnSave: "💾 Save Changes", btnLogout: "Logout", backAlbum: "⬅ Back to Albums", backCard: "⬅ Back to Cards", markDone: "✔ Set all missing to 1", noMatch: "No matching players found.", givesYou: "They can give you:", asksFrom: "They ask from you:", traded: "Traded!" },
+            hu: { state: "Állam", alliance: "Szövetség", btnClan: "🤝 Keresés Klánban", btnState: "🌍 Keresés Államban", searchPh: "🔍 Keresés albumra vagy kártyára...", btnSave: "💾 Változások Mentése", btnLogout: "Kijelentkezés", backAlbum: "⬅ Vissza az Albumokhoz", backCard: "⬅ Vissza a Kártyákhoz", markDone: "✔ Hiányzók 1-re állítása", noMatch: "Nincs találat a cserepartnerekre.", givesYou: "Tud adni neked:", asksFrom: "Kéri tőled:", traded: "Elcseréltük!" },
+            de: { state: "Staat", alliance: "Allianz", btnClan: "🤝 Suche im Clan", btnState: "🌍 Suche im Staat", searchPh: "🔍 Album oder Karte suchen...", btnSave: "💾 Änderungen speichern", btnLogout: "Abmelden", backAlbum: "⬅ Zurück zu Alben", backCard: "⬅ Zurück zu Karten", markDone: "✔ Alle fehlenden auf 1", noMatch: "Keine passenden Spieler gefunden.", givesYou: "Kann dir geben:", asksFrom: "Fragt von dir:", traded: "Gehandelt!" },
+            fr: { state: "État", alliance: "Alliance", btnClan: "🤝 Chercher dans le Clan", btnState: "🌍 Chercher dans l'État", searchPh: "🔍 Chercher un album ou une carte...", btnSave: "💾 Sauvegarder", btnLogout: "Déconnexion", backAlbum: "⬅ Retour aux Albums", backCard: "⬅ Retour aux Cartes", markDone: "✔ Marquer manquants à 1", noMatch: "Aucun joueur correspondant trouvé.", givesYou: "Peut vous donner:", asksFrom: "Vous demande:", traded: "Échangé!" },
+            tr: { state: "Eyalet", alliance: "İttifak", btnClan: "🤝 Klanda Ara", btnState: "🌍 Eyalette Ara", searchPh: "🔍 Albüm veya kart ara...", btnSave: "💾 Değişiklikleri Kaydet", btnLogout: "Çıkış Yap", backAlbum: "⬅ Albümlere Dön", backCard: "⬅ Kartlara Dön", markDone: "✔ Eksikleri 1 yap", noMatch: "Eşleşen oyuncu bulunamadı.", givesYou: "Sana verebilir:", asksFrom: "Senden istiyor:", traded: "Takas edildi!" },
+            ru: { state: "Штат", alliance: "Альянс", btnClan: "🤝 Поиск в клане", btnState: "🌍 Поиск в штате", searchPh: "🔍 Поиск альбома или карты...", btnSave: "💾 Сохранить изменения", btnLogout: "Выйти", backAlbum: "⬅ Назад к альбомам", backCard: "⬅ Назад к картам", markDone: "✔ Установить недостающие на 1", noMatch: "Подходящих игроков не найдено.", givesYou: "Может дать вам:", asksFrom: "Просит у вас:", traded: "Обменялись!" },
+            ar: { state: "حالة", alliance: "تحالف", btnClan: "🤝 البحث في العشيرة", btnState: "🌍 البحث في الولاية", searchPh: "🔍 البحث عن ألبوم أو بطاقة...", btnSave: "💾 حفظ التغييرات", btnLogout: "تسجيل خروج", backAlbum: "⬅ العودة للألبومات", backCard: "⬅ العودة للبطاقات", markDone: "✔ تعيين المفقود إلى 1", noMatch: "لم يتم العثور على لاعبين.", givesYou: "يمكن أن يعطيك:", asksFrom: "يطلب منك:", traded: "تم التبادل!" }
+        };
+        let currLang = 'en';
+
+        window.changeLanguage = function(lang) {
+            currLang = lang;
+            document.querySelector('.t-state').textContent = i18n[lang].state;
+            document.querySelector('.t-alliance').textContent = i18n[lang].alliance;
+            document.querySelector('.t-btn-clan').textContent = i18n[lang].btnClan;
+            document.querySelector('.t-btn-state').textContent = i18n[lang].btnState;
+            document.querySelector('.t-search-ph').placeholder = i18n[lang].searchPh;
+            document.querySelector('.t-btn-save').textContent = i18n[lang].btnSave;
+            document.querySelector('.t-btn-logout').textContent = i18n[lang].btnLogout;
+            
+            // Re-render current view to update buttons
+            if(document.getElementById('view-cards').style.display === 'block') renderCards(currentAlbumGlobal);
+            if(document.getElementById('view-puzzle').style.display === 'block') renderPuzzle(currentAlbumGlobal, currentCardGlobal);
+        };
+
+        // Adatbázis generálás
+        const albumNames = [ "Rekindled Flames", "Explore the World", "Daybreak Island", "Tundra Alliance", "Battlefield Epic", "Spectacular Adventures", "Divine Weapons", "Song of Heroes", "The Labyrinth", "Nature’s Strength", "Crystalline Mysteries", "Ballad of Wind and Cold", "Infernal Power", "Prerogative of the Flame", "Frostdragon Empire", "Kings of Combat" ];
         const gameData = albumNames.map((name, aIdx) => {
             return {
-                id: `album_${aIdx}`,
-                name: name,
-                cards: Array.from({length: 9}, (_, cIdx) => ({
-                    id: `album_${aIdx}_card_${cIdx+1}`,
-                    name: `Kártya ${cIdx+1}`
-                }))
+                id: `album_${aIdx}`, name: name,
+                cards: Array.from({length: 9}, (_, cIdx) => ({ id: `album_${aIdx}_card_${cIdx+1}`, name: `Card ${cIdx+1}` }))
             };
         });
 
+        // Képernyők kezelése
         const authScreen = document.getElementById('auth-screen');
         const profileScreen = document.getElementById('profile-setup-screen');
         const mainScreen = document.getElementById('main-app-screen');
@@ -155,15 +196,21 @@ const firebaseConfig = {
         }
 
         document.getElementById('email-register-btn').addEventListener('click', () => createUserWithEmailAndPassword(auth, document.getElementById('email-input').value, document.getElementById('password-input').value).catch(e => document.getElementById('auth-error').textContent = e.message));
-        document.getElementById('email-login-btn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email-input').value, document.getElementById('password-input').value).catch(e => document.getElementById('auth-error').textContent = "Hibás adat."));
+        document.getElementById('email-login-btn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email-input').value, document.getElementById('password-input').value).catch(e => document.getElementById('auth-error').textContent = "Incorrect data."));
         document.getElementById('google-login-btn').addEventListener('click', () => signInWithPopup(auth, provider).catch(e => console.error(e)));
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
+        // --- VALIDÁCIÓ (Profil mentés) ---
         document.getElementById('save-profile-btn').addEventListener('click', async () => {
-            const pName = document.getElementById('player-name').value;
-            const pServer = document.getElementById('server-number').value;
-            const pAlliance = document.getElementById('alliance-name').value;
-            if(!pName || !pServer || !pAlliance) return document.getElementById('profile-error').textContent = "Tölts ki mindent!";
+            const pName = document.getElementById('player-name').value.trim();
+            const pServer = document.getElementById('server-number').value.trim();
+            const pAlliance = document.getElementById('alliance-name').value.trim().toUpperCase();
+            const errorDiv = document.getElementById('profile-error');
+
+            if(!pName || !pServer || !pAlliance) { errorDiv.textContent = "Please fill all fields!"; return; }
+            if(pServer.length !== 4 || isNaN(pServer)) { errorDiv.textContent = "State must be exactly 4 numbers (e.g., 2530)."; return; }
+            if(pAlliance.length !== 3) { errorDiv.textContent = "Alliance tag must be exactly 3 characters (e.g., ABC)."; return; }
+
             await setDoc(doc(db, "jatekosok", currentUserUid), { jatekNev: pName, szerver: pServer, szovetseg: pAlliance, inventory: {} });
             checkUserProfile(currentUserUid);
         });
@@ -203,8 +250,9 @@ const firebaseConfig = {
 
         function renderAlbums() {
             hideAllViews();
+            currentAlbumGlobal = null; currentCardGlobal = null;
             searchInput.value = ''; 
-            viewAlbums.innerHTML = '<h3>Válassz egy Albumot:</h3>';
+            viewAlbums.innerHTML = '';
             gameData.forEach(album => {
                 const btn = document.createElement('div');
                 btn.className = 'list-item';
@@ -217,12 +265,13 @@ const firebaseConfig = {
 
         function renderCards(album) {
             hideAllViews();
+            currentAlbumGlobal = album;
             searchInput.value = '';
             viewCards.innerHTML = '';
             
             const backBtn = document.createElement('button');
             backBtn.className = 'btn btn-back';
-            backBtn.textContent = '⬅ Vissza az Albumokhoz';
+            backBtn.textContent = i18n[currLang].backAlbum;
             backBtn.onclick = () => renderAlbums();
             
             viewCards.appendChild(backBtn);
@@ -238,17 +287,41 @@ const firebaseConfig = {
             viewCards.style.display = 'block';
         }
 
-        function renderPuzzle(album, card) {
+        // --- PUZZLE NÉZET + GYORSÍTÓ GOMB ---
+        window.renderPuzzle = function(album, card) {
             hideAllViews();
+            currentAlbumGlobal = album; currentCardGlobal = card;
             searchInput.value = '';
             viewPuzzle.innerHTML = '';
             
+            const topControls = document.createElement('div');
+            topControls.style.display = "flex"; topControls.style.justifyContent = "space-between"; topControls.style.alignItems = "center";
+            
             const backBtn = document.createElement('button');
             backBtn.className = 'btn btn-back';
-            backBtn.textContent = '⬅ Vissza a Kártyákhoz';
+            backBtn.style.margin = "0";
+            backBtn.textContent = i18n[currLang].backCard;
             backBtn.onclick = () => renderCards(album);
             
-            viewPuzzle.appendChild(backBtn);
+            // GYORSÍTÓ GOMB (Minden nullásat 1-re állít)
+            const markDoneBtn = document.createElement('button');
+            markDoneBtn.className = 'btn btn-green';
+            markDoneBtn.style.width = "auto"; markDoneBtn.style.padding = "8px 15px"; markDoneBtn.style.margin = "0";
+            markDoneBtn.textContent = i18n[currLang].markDone;
+            markDoneBtn.onclick = () => {
+                for(let p = 1; p <= 15; p++) {
+                    const pid = `${card.id}_piece_${p}`;
+                    if(!userInventory[pid] || userInventory[pid] === 0) {
+                        userInventory[pid] = 1; // Csak a hiányzót módosítja!
+                    }
+                }
+                renderPuzzle(album, card); // Újrarajzolja a rácsot
+            };
+
+            topControls.appendChild(backBtn);
+            topControls.appendChild(markDoneBtn);
+            
+            viewPuzzle.appendChild(topControls);
             viewPuzzle.insertAdjacentHTML('beforeend', `<h3><small>${album.name}</small><br>${card.name}</h3>`);
             
             const grid = document.createElement('div');
@@ -258,15 +331,38 @@ const firebaseConfig = {
                 const pieceId = `${card.id}_piece_${p}`;
                 const currentQty = userInventory[pieceId] || 0; 
                 
+                // VIZUÁLIS LOGIKA: 0, ✔, vagy +X
+                let displayQty = currentQty;
+                let bgClass = '';
+                if (currentQty === 0) { displayQty = "0"; bgClass = 'piece-missing'; }
+                else if (currentQty === 1) { displayQty = "✔"; }
+                else { displayQty = `+${currentQty - 1}`; bgClass = 'piece-surplus'; }
+                
                 const pieceDiv = document.createElement('div');
-                pieceDiv.className = `puzzle-piece ${currentQty === 0 ? 'piece-missing' : ''}`;
+                pieceDiv.className = `puzzle-piece ${bgClass}`;
+                pieceDiv.id = `box-${pieceId}`;
+                pieceDiv.tabIndex = 0; // BILLENTYŰZET FÓKUSZ
+                
+                // BILLENTYŰZET NAVIGÁCIÓ (Fel, Le, Balra, Jobbra)
+                pieceDiv.onkeydown = (e) => {
+                    if (e.key === 'ArrowUp') { updateQty(pieceId, 1); e.preventDefault(); }
+                    if (e.key === 'ArrowDown') { updateQty(pieceId, -1); e.preventDefault(); }
+                    if (e.key === 'ArrowRight') { 
+                        if(pieceDiv.nextElementSibling) pieceDiv.nextElementSibling.focus(); 
+                        e.preventDefault(); 
+                    }
+                    if (e.key === 'ArrowLeft') { 
+                        if(pieceDiv.previousElementSibling) pieceDiv.previousElementSibling.focus(); 
+                        e.preventDefault(); 
+                    }
+                };
                 
                 pieceDiv.innerHTML = `
                     <div class="piece-shape">${p}</div>
                     <div class="controls">
-                        <button class="qty-btn minus" onclick="updateQty('${pieceId}', -1)">-</button>
-                        <span class="qty-display" id="qty-${pieceId}">${currentQty}</span>
-                        <button class="qty-btn plus" onclick="updateQty('${pieceId}', 1)">+</button>
+                        <button tabindex="-1" class="qty-btn minus" onclick="updateQty('${pieceId}', -1); document.getElementById('box-${pieceId}').focus();">-</button>
+                        <span class="qty-display" id="qty-${pieceId}">${displayQty}</span>
+                        <button tabindex="-1" class="qty-btn plus" onclick="updateQty('${pieceId}', 1); document.getElementById('box-${pieceId}').focus();">+</button>
                     </div>
                 `;
                 grid.appendChild(pieceDiv);
@@ -280,7 +376,7 @@ const firebaseConfig = {
             if(query === '') return renderAlbums();
 
             hideAllViews();
-            viewSearch.innerHTML = `<h3>Találatok erre: "${query}"</h3>`;
+            viewSearch.innerHTML = `<h3>... "${query}"</h3>`;
             let foundSomething = false;
 
             gameData.forEach(album => {
@@ -288,7 +384,7 @@ const firebaseConfig = {
                     foundSomething = true;
                     const res = document.createElement('div');
                     res.className = 'list-item search-item';
-                    res.innerHTML = `📖 ${album.name} <span>(Ugrás az album kártyáihoz)</span>`;
+                    res.innerHTML = `📖 ${album.name}`;
                     res.onclick = () => renderCards(album);
                     viewSearch.appendChild(res);
                 }
@@ -297,59 +393,67 @@ const firebaseConfig = {
                         foundSomething = true;
                         const res = document.createElement('div');
                         res.className = 'list-item search-item card-item';
-                        res.innerHTML = `${card.name} <span>Album: ${album.name}</span>`;
+                        res.innerHTML = `${card.name} <span>${album.name}</span>`;
                         res.onclick = () => renderPuzzle(album, card);
                         viewSearch.appendChild(res);
                     }
                 });
             });
 
-            if(!foundSomething) viewSearch.innerHTML += '<p>Nincs találat.</p>';
+            if(!foundSomething) viewSearch.innerHTML += `<p>${i18n[currLang].noMatch}</p>`;
             viewSearch.style.display = 'block';
         });
 
+        // Darabszám módosító (vizuális visszajelzéssel)
         window.updateQty = function(pieceId, change) {
             let currentQty = userInventory[pieceId] || 0;
             currentQty += change;
             if (currentQty < 0) currentQty = 0; 
             
             userInventory[pieceId] = currentQty; 
-            document.getElementById(`qty-${pieceId}`).textContent = currentQty;
             
-            const pieceBox = document.getElementById(`qty-${pieceId}`).closest('.puzzle-piece');
-            if(currentQty === 0) pieceBox.classList.add('piece-missing');
-            else pieceBox.classList.remove('piece-missing');
+            let displayQty = currentQty;
+            const pieceBox = document.getElementById(`box-${pieceId}`);
+            
+            pieceBox.classList.remove('piece-missing', 'piece-surplus');
+            
+            if(currentQty === 0) {
+                displayQty = "0";
+                pieceBox.classList.add('piece-missing');
+            } else if(currentQty === 1) {
+                displayQty = "✔";
+            } else {
+                displayQty = `+${currentQty - 1}`;
+                pieceBox.classList.add('piece-surplus');
+            }
+            
+            document.getElementById(`qty-${pieceId}`).textContent = displayQty;
         };
 
-        // Mentés gomb - 2 Másodperces Toast
         document.getElementById('save-inventory-btn').addEventListener('click', async () => {
             const toast = document.getElementById('toast-msg');
             try {
                 await updateDoc(doc(db, "jatekosok", currentUserUid), { inventory: userInventory });
-                toast.textContent = "✅ Sikeres mentés!";
+                toast.textContent = "✅ Saved!";
                 toast.style.backgroundColor = "rgba(40, 167, 69, 0.95)";
                 toast.classList.add("show");
-                
-                // MÓDOSÍTVA: 2000 ms = 2 másodperc
                 setTimeout(() => toast.classList.remove("show"), 2000);
             } catch (error) {
-                console.error("Hiba:", error);
-                toast.textContent = "❌ Hiba a mentésnél!";
+                toast.textContent = "❌ Error!";
                 toast.style.backgroundColor = "rgba(220, 53, 69, 0.95)";
                 toast.classList.add("show");
                 setTimeout(() => toast.classList.remove("show"), 2000);
             }
         });
 
-        // --- ÚJ: GLOBÁLIS CSERE-MOTOR (Klán / Állam) ---
         window.runMatchmaker = async function(scope) {
             hideAllViews();
-            viewMatchmaker.innerHTML = '<h3>⏳ Adatbázis elemzése...</h3>';
+            viewMatchmaker.innerHTML = '<h3>⏳...</h3>';
             viewMatchmaker.style.display = 'block';
 
             const backBtn = document.createElement('button');
             backBtn.className = 'btn btn-back';
-            backBtn.textContent = '⬅ Vissza a főoldalra';
+            backBtn.textContent = i18n[currLang].backAlbum;
             backBtn.onclick = () => renderAlbums();
 
             try {
@@ -358,10 +462,8 @@ const firebaseConfig = {
 
                 let q;
                 if (scope === 'alliance') {
-                    // Keresés klánon belül
                     q = query(collection(db, "jatekosok"), where("szerver", "==", myServer), where("szovetseg", "==", myAlliance));
                 } else {
-                    // Keresés az egész államban
                     q = query(collection(db, "jatekosok"), where("szerver", "==", myServer));
                 }
                 
@@ -375,7 +477,6 @@ const firebaseConfig = {
 
                     const otherData = userDoc.data();
                     const otherInv = otherData.inventory || {};
-                    // Állami keresésnél jelezzük a klánt is a neve mellett
                     const otherName = `${otherData.jatekNev || otherData.nev} [${otherData.szovetseg}]`; 
 
                     let giveToMe = []; 
@@ -387,23 +488,21 @@ const firebaseConfig = {
                                 const pieceId = `${card.id}_piece_${p}`;
                                 const myQty = userInventory[pieceId] || 0;
                                 const otherQty = otherInv[pieceId] || 0;
-                                const pieceName = `<b>${album.name}</b><br>${card.name} / ${p}. db`;
+                                const pieceName = `<b>${album.name}</b><br>${card.name} / ${p}.`;
 
                                 if (myQty === 0 && otherQty >= 2) {
-                                    // Ő adja nekem (Receive)
                                     giveToMe.push(`
                                         <div class="trade-row">
                                             <span>🟢 ${pieceName}</span>
-                                            <button class="btn btn-green btn-small" onclick="executeTrade('${userDoc.id}', '${pieceId}', 'receive', this)">Elcseréltük!</button>
+                                            <button class="btn btn-green btn-small" onclick="executeTrade('${userDoc.id}', '${pieceId}', 'receive', this)">${i18n[currLang].traded}</button>
                                         </div>
                                     `);
                                 }
                                 if (myQty >= 2 && otherQty === 0) {
-                                    // Én adom neki (Give)
                                     takeFromMe.push(`
                                         <div class="trade-row">
                                             <span>🔵 ${pieceName}</span>
-                                            <button class="btn btn-blue btn-small" onclick="executeTrade('${userDoc.id}', '${pieceId}', 'give', this)">Elcseréltük!</button>
+                                            <button class="btn btn-blue btn-small" onclick="executeTrade('${userDoc.id}', '${pieceId}', 'give', this)">${i18n[currLang].traded}</button>
                                         </div>
                                     `);
                                 }
@@ -416,11 +515,11 @@ const firebaseConfig = {
                         resultsHtml += `<div class="match-card"><h4>👤 ${otherName}</h4>`;
                         if (giveToMe.length > 0) {
                             resultsHtml += `<div class="match-detail" style="border-left: 3px solid #6bc85f;">
-                                            <b>Ő tud adni neked:</b><br>${giveToMe.join('')}</div>`;
+                                            <b>${i18n[currLang].givesYou}</b><br>${giveToMe.join('')}</div>`;
                         }
                         if (takeFromMe.length > 0) {
                             resultsHtml += `<div class="match-detail" style="border-left: 3px solid #4285F4;">
-                                            <b>Te tudsz adni neki:</b><br>${takeFromMe.join('')}</div>`;
+                                            <b>${i18n[currLang].asksFrom}</b><br>${takeFromMe.join('')}</div>`;
                         }
                         resultsHtml += `</div>`;
                     }
@@ -428,58 +527,40 @@ const firebaseConfig = {
 
                 viewMatchmaker.innerHTML = '';
                 viewMatchmaker.appendChild(backBtn);
-                const scopeTitle = scope === 'alliance' ? `🤝 Cserepartnerek (${myAlliance})` : `🌍 Cserepartnerek (${myServer}. Állam)`;
-                viewMatchmaker.insertAdjacentHTML('beforeend', `<h3>${scopeTitle}</h3>`);
+                viewMatchmaker.insertAdjacentHTML('beforeend', `<h3>🤝 ${scope === 'alliance' ? myAlliance : myServer}</h3>`);
 
                 if (hasMatches) {
                     viewMatchmaker.insertAdjacentHTML('beforeend', resultsHtml);
                 } else {
-                    viewMatchmaker.insertAdjacentHTML('beforeend', `<p>Sajnos jelenleg nincs olyan játékos, akivel oda-vissza cserélni tudnál.</p>`);
+                    viewMatchmaker.insertAdjacentHTML('beforeend', `<p>${i18n[currLang].noMatch}</p>`);
                 }
 
             } catch (error) {
                 console.error(error);
-                viewMatchmaker.innerHTML = '<h3>❌ Hiba történt a keresés közben.</h3>';
+                viewMatchmaker.innerHTML = '<h3>❌ Error</h3>';
                 viewMatchmaker.appendChild(backBtn);
             }
         };
 
-        // --- ÚJ: TRANZAKCIÓ (Automatikus plusz/mínusz mindkét félnél) ---
         window.executeTrade = async function(otherUid, pieceId, type, btnElement) {
-            // Felugró megerősítés
-            if(!confirm("Biztosan elcseréltétek a játékban? \nEz azonnal levonja/hozzáadja a darabot mindkettőtök raktárához!")) return;
-            
+            if(!confirm("Are you sure? This updates both inventories!")) return;
             btnElement.disabled = true;
-            btnElement.textContent = "⏳ Kérlek várj...";
+            btnElement.textContent = "⏳...";
 
             try {
-                // Ha én ADOK: nekem -1, neki +1
-                // Ha én KAPOK: nekem +1, neki -1
                 let myChange = (type === 'give') ? -1 : 1;
                 let otherChange = (type === 'give') ? 1 : -1;
 
-                // 1. Saját raktáram frissítése az adatbázisban (az 'increment' paranccsal)
-                await updateDoc(doc(db, "jatekosok", currentUserUid), {
-                    [`inventory.${pieceId}`]: increment(myChange)
-                });
-                
-                // 2. Másik játékos raktárának frissítése az adatbázisban
-                await updateDoc(doc(db, "jatekosok", otherUid), {
-                    [`inventory.${pieceId}`]: increment(otherChange)
-                });
+                await updateDoc(doc(db, "jatekosok", currentUserUid), { [`inventory.${pieceId}`]: increment(myChange) });
+                await updateDoc(doc(db, "jatekosok", otherUid), { [`inventory.${pieceId}`]: increment(otherChange) });
 
-                // 3. A memóriában lévő saját darabszámomat is frissítem, hogy ne kelljen frissíteni az oldalt
                 userInventory[pieceId] = (userInventory[pieceId] || 0) + myChange;
-
-                // Siker!
-                btnElement.textContent = "✅ Kész";
+                btnElement.textContent = "✅";
                 btnElement.style.backgroundColor = "#555";
-                
             } catch(error) {
-                console.error("Csere hiba:", error);
-                alert("Hiba történt a csere rögzítésekor! Lehet, hogy megszakadt a kapcsolat.");
+                alert("Trade error!");
                 btnElement.disabled = false;
-                btnElement.textContent = "Elcseréltük!";
+                btnElement.textContent = i18n[currLang].traded;
             }
         };
     </script>
