@@ -15,17 +15,18 @@
         .btn-red { background-color: #d9534f; } .btn-red:hover { background-color: #c9302c; }
         .btn-back { background-color: #8892a3; width: auto; padding: 8px 15px; margin-bottom: 15px; }
         
-        /* Navigációs dizájn (Játék-szerű) */
-        .list-item { background: #1a2a40; color: white; padding: 15px; border-radius: 8px; margin: 10px auto; cursor: pointer; font-size: 18px; font-weight: bold; width: 90%; transition: transform 0.1s;}
+        /* Navigációs dizájn */
+        .list-item { background: #1a2a40; color: white; padding: 15px; border-radius: 8px; margin: 10px auto; cursor: pointer; font-size: 18px; font-weight: bold; width: 90%; transition: transform 0.1s; text-align: center;}
         .list-item:active { transform: scale(0.98); }
         .card-item { background: #e09f3e; color: white; }
         .search-item { background: #17a2b8; color: white; text-align: left; padding: 10px 15px; }
         .search-item span { display: block; font-size: 12px; color: #eef2f5; font-weight: normal; }
 
-        /* Kereső sáv */
+        /* Kereső sáv és Főgombok */
         #search-bar { position: sticky; top: 0; background: white; padding: 10px 0; z-index: 10; border-bottom: 2px solid #eee; margin-bottom: 15px;}
+        .action-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
         
-        /* Puzzle Darabok Rácsa */
+        /* Puzzle Rács */
         .puzzle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 10px; }
         .puzzle-piece { border-radius: 8px; padding: 5px; background: #5a82e6; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 100px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
         .piece-shape { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; margin-bottom: 5px;}
@@ -37,10 +38,25 @@
         .qty-display { font-weight: bold; color: #333; font-size: 14px;}
         .piece-missing { background: #8892a3; }
         
-        #save-status { color: green; font-weight: bold; height: 24px; margin: 10px 0; font-size: 16px; transition: opacity 0.5s;}
+        /* ÚJ: Képernyő közepén felugró (Toast) Mentés Értesítés */
+        #toast-msg {
+            visibility: hidden; min-width: 250px; background-color: rgba(40, 167, 69, 0.95);
+            color: #fff; text-align: center; border-radius: 8px; padding: 20px;
+            position: fixed; z-index: 1000; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            font-size: 20px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0; transition: opacity 0.4s, visibility 0.4s; pointer-events: none;
+        }
+        #toast-msg.show { visibility: visible; opacity: 1; }
+        
+        /* Matchmaker kártya dizájn */
+        .match-card { background: #2a3b50; color: white; padding: 15px; border-radius: 8px; margin: 10px auto; width: 90%; text-align: left; box-shadow: 0 2px 5px rgba(0,0,0,0.2);}
+        .match-card h4 { margin: 0 0 10px 0; color: #ffd700; border-bottom: 1px solid #4a5b70; padding-bottom: 5px;}
+        .match-detail { margin: 5px 0; font-size: 14px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px;}
     </style>
 </head>
 <body>
+
+    <div id="toast-msg">✅ Sikeres mentés!</div>
 
     <div id="auth-screen" class="container">
         <h2>Lépj be vagy Regisztrálj</h2>
@@ -62,7 +78,7 @@
     </div>
 
     <div id="main-app-screen" class="container" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div style="text-align: left;">
                 <h3 style="margin: 0; color:#4285F4;" id="display-name"></h3>
                 <small>Állam: <b id="display-server"></b> | Klán: <b id="display-alliance"></b></small>
@@ -70,25 +86,27 @@
             <button id="logout-btn" class="btn btn-red" style="width: auto; padding: 5px 10px;">Kilépés</button>
         </div>
         
+        <div class="action-buttons">
+            <button id="matchmaker-btn" class="btn btn-dark" style="width: 100%;">🤝 Kivel tudok cserélni? (Klán kereső)</button>
+        </div>
+
         <div id="search-bar">
             <input type="text" id="search-input" placeholder="🔍 Keresés albumra vagy kártyára...">
         </div>
-        
-        <div id="save-status"></div>
 
         <div id="view-albums"></div>
         <div id="view-cards" style="display: none;"></div>
         <div id="view-puzzle" style="display: none;"></div>
         <div id="view-search-results" style="display: none;"></div>
-
-        <br><hr><br>
+        <div id="view-matchmaker" style="display: none;"></div> <br><hr><br>
         <button id="save-inventory-btn" class="btn btn-green" style="font-size: 18px; padding: 15px;">💾 Változások Mentése</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // ÚJ: Behozzuk a collection, query, where, getDocs parancsokat a keresőhöz!
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // IDE MÁSOLD BE A SAJÁT KULCSODAT!
         const firebaseConfig = {
@@ -100,7 +118,6 @@
   appId: "1:469371801375:web:71007b232a98fe8bdbea2a",
   measurementId: "G-2LQT9X23X5"
 };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -109,7 +126,7 @@
         let currentUserUid = null;
         let userInventory = {}; 
 
-        // Adatbázis struktúra generálása (Memóriában)
+        // Adatbázis (Albumok generálása)
         const albumNames = [
             "Rekindled Flames", "Explore the World", "Daybreak Island", "Tundra Alliance", 
             "Battlefield Epic", "Spectacular Adventures", "Divine Weapons", "Song of Heroes", 
@@ -123,12 +140,12 @@
                 name: name,
                 cards: Array.from({length: 9}, (_, cIdx) => ({
                     id: `album_${aIdx}_card_${cIdx+1}`,
-                    name: `Kártya ${cIdx+1}` // Ezeket majd később cserélhetjük a pontos nevekre!
+                    name: `Kártya ${cIdx+1}`
                 }))
             };
         });
 
-        // --- Alap funkciók és belépés ---
+        // Képernyők kezelése
         const authScreen = document.getElementById('auth-screen');
         const profileScreen = document.getElementById('profile-setup-screen');
         const mainScreen = document.getElementById('main-app-screen');
@@ -160,7 +177,7 @@
                 document.getElementById('display-server').textContent = data.szerver;
                 document.getElementById('display-alliance').textContent = data.szovetseg;
                 userInventory = data.inventory || {}; 
-                renderAlbums(); // Főoldal betöltése
+                renderAlbums(); 
                 showScreen(mainScreen);
             } else {
                 showScreen(profileScreen);
@@ -172,26 +189,24 @@
             else { currentUserUid = null; showScreen(authScreen); }
         });
 
-        // --- ÚJ UI NÉZETEK KEZELÉSE ---
+        // UI Nézetek
         const viewAlbums = document.getElementById('view-albums');
         const viewCards = document.getElementById('view-cards');
         const viewPuzzle = document.getElementById('view-puzzle');
         const viewSearch = document.getElementById('view-search-results');
+        const viewMatchmaker = document.getElementById('view-matchmaker'); // Új nézet
         const searchInput = document.getElementById('search-input');
 
         function hideAllViews() {
-            viewAlbums.style.display = 'none';
-            viewCards.style.display = 'none';
-            viewPuzzle.style.display = 'none';
-            viewSearch.style.display = 'none';
+            viewAlbums.style.display = 'none'; viewCards.style.display = 'none';
+            viewPuzzle.style.display = 'none'; viewSearch.style.display = 'none';
+            viewMatchmaker.style.display = 'none';
         }
 
-        // 1. Szint: ALBUMOK NÉZET
         function renderAlbums() {
             hideAllViews();
-            searchInput.value = ''; // Kereső nullázása
+            searchInput.value = ''; 
             viewAlbums.innerHTML = '<h3>Válassz egy Albumot:</h3>';
-            
             gameData.forEach(album => {
                 const btn = document.createElement('div');
                 btn.className = 'list-item';
@@ -202,7 +217,6 @@
             viewAlbums.style.display = 'block';
         }
 
-        // 2. Szint: KÁRTYÁK NÉZET
         function renderCards(album) {
             hideAllViews();
             searchInput.value = '';
@@ -213,11 +227,8 @@
             backBtn.textContent = '⬅ Vissza az Albumokhoz';
             backBtn.onclick = () => renderAlbums();
             
-            const title = document.createElement('h3');
-            title.textContent = `📖 ${album.name}`;
-            
             viewCards.appendChild(backBtn);
-            viewCards.appendChild(title);
+            viewCards.insertAdjacentHTML('beforeend', `<h3>📖 ${album.name}</h3>`);
             
             album.cards.forEach(card => {
                 const btn = document.createElement('div');
@@ -229,7 +240,6 @@
             viewCards.style.display = 'block';
         }
 
-        // 3. Szint: PUZZLE RÁCS NÉZET
         function renderPuzzle(album, card) {
             hideAllViews();
             searchInput.value = '';
@@ -240,11 +250,8 @@
             backBtn.textContent = '⬅ Vissza a Kártyákhoz';
             backBtn.onclick = () => renderCards(album);
             
-            const title = document.createElement('h3');
-            title.innerHTML = `<small>${album.name}</small><br>${card.name}`;
-            
             viewPuzzle.appendChild(backBtn);
-            viewPuzzle.appendChild(title);
+            viewPuzzle.insertAdjacentHTML('beforeend', `<h3><small>${album.name}</small><br>${card.name}</h3>`);
             
             const grid = document.createElement('div');
             grid.className = 'puzzle-grid';
@@ -270,21 +277,15 @@
             viewPuzzle.style.display = 'block';
         }
 
-        // --- GLOÁBILIS KERESŐ LOGIKA ---
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
-            if(query === '') {
-                renderAlbums(); // Ha kitörli a szöveget, visszadobjuk a főoldalra
-                return;
-            }
+            if(query === '') return renderAlbums();
 
             hideAllViews();
             viewSearch.innerHTML = `<h3>Találatok erre: "${query}"</h3>`;
-            
             let foundSomething = false;
 
             gameData.forEach(album => {
-                // Egyezik az album nevével?
                 if(album.name.toLowerCase().includes(query)) {
                     foundSomething = true;
                     const res = document.createElement('div');
@@ -293,28 +294,22 @@
                     res.onclick = () => renderCards(album);
                     viewSearch.appendChild(res);
                 }
-
-                // Egyezik valamelyik kártya nevével az albumon belül?
                 album.cards.forEach(card => {
                     if(card.name.toLowerCase().includes(query)) {
                         foundSomething = true;
                         const res = document.createElement('div');
                         res.className = 'list-item search-item card-item';
-                        res.innerHTML = `${card.name} <span>Album: ${album.name} (Ugrás a puzzle darabokhoz)</span>`;
+                        res.innerHTML = `${card.name} <span>Album: ${album.name}</span>`;
                         res.onclick = () => renderPuzzle(album, card);
                         viewSearch.appendChild(res);
                     }
                 });
             });
 
-            if(!foundSomething) {
-                viewSearch.innerHTML += '<p>Nincs találat. Próbálj másik szót!</p>';
-            }
-
+            if(!foundSomething) viewSearch.innerHTML += '<p>Nincs találat.</p>';
             viewSearch.style.display = 'block';
         });
 
-        // Darabszám módosító
         window.updateQty = function(pieceId, change) {
             let currentQty = userInventory[pieceId] || 0;
             currentQty += change;
@@ -324,29 +319,116 @@
             document.getElementById(`qty-${pieceId}`).textContent = currentQty;
             
             const pieceBox = document.getElementById(`qty-${pieceId}`).closest('.puzzle-piece');
-            if(currentQty === 0) {
-                pieceBox.classList.add('piece-missing');
-            } else {
-                pieceBox.classList.remove('piece-missing');
-            }
+            if(currentQty === 0) pieceBox.classList.add('piece-missing');
+            else pieceBox.classList.remove('piece-missing');
         };
 
-        // Mentés gomb
+        // Mentés (Középre ugró Toast Üzenettel)
         document.getElementById('save-inventory-btn').addEventListener('click', async () => {
-            const statusText = document.getElementById('save-status');
-            statusText.textContent = "⏳ Mentés folyamatban...";
-            statusText.style.color = "orange";
-            statusText.style.opacity = "1";
-
+            const toast = document.getElementById('toast-msg');
+            
             try {
                 await updateDoc(doc(db, "jatekosok", currentUserUid), { inventory: userInventory });
-                statusText.textContent = "✅ Sikeres mentés!";
-                statusText.style.color = "green";
-                setTimeout(() => statusText.style.opacity = "0", 3000);
+                
+                // Megjelenítjük a zöld üzenetet a képernyő közepén!
+                toast.textContent = "✅ Sikeres mentés!";
+                toast.style.backgroundColor = "rgba(40, 167, 69, 0.95)";
+                toast.classList.add("show");
+                
+                // 3 másodperc múlva eltüntetjük
+                setTimeout(() => toast.classList.remove("show"), 3000);
             } catch (error) {
                 console.error("Hiba:", error);
-                statusText.textContent = "❌ Hiba történt a mentés során!";
-                statusText.style.color = "red";
+                toast.textContent = "❌ Hiba a mentésnél!";
+                toast.style.backgroundColor = "rgba(220, 53, 69, 0.95)";
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 3000);
+            }
+        });
+
+        // --- ÚJ: A KLÁN CSERE-KERESŐ MOTOR ---
+        document.getElementById('matchmaker-btn').addEventListener('click', async () => {
+            hideAllViews();
+            viewMatchmaker.innerHTML = '<h3>⏳ Adatbázis elemzése...</h3>';
+            viewMatchmaker.style.display = 'block';
+
+            const backBtn = document.createElement('button');
+            backBtn.className = 'btn btn-back';
+            backBtn.textContent = '⬅ Vissza a főoldalra';
+            backBtn.onclick = () => renderAlbums();
+
+            try {
+                const myServer = document.getElementById('display-server').textContent;
+                const myAlliance = document.getElementById('display-alliance').textContent;
+
+                // Lekérjük a Firebase-ből csak azokat az embereket, akik ugyanazon a szerveren és klánban vannak!
+                const q = query(collection(db, "jatekosok"), where("szerver", "==", myServer), where("szovetseg", "==", myAlliance));
+                const querySnapshot = await getDocs(q);
+
+                let resultsHtml = '';
+                let hasMatches = false;
+
+                querySnapshot.forEach((userDoc) => {
+                    if (userDoc.id === currentUserUid) return; // Magunkkal nem cserélünk
+
+                    const otherData = userDoc.data();
+                    const otherInv = otherData.inventory || {};
+                    const otherName = otherData.jatekNev || otherData.nev || "Ismeretlen Játékos";
+
+                    let giveToMe = []; // Neki 2+ van, nekem 0
+                    let takeFromMe = []; // Nekem 2+ van, neki 0
+
+                    // Végigmegyünk az összes kártyán és összehasonlítjuk
+                    gameData.forEach(album => {
+                        album.cards.forEach(card => {
+                            for(let p = 1; p <= 15; p++) {
+                                const pieceId = `${card.id}_piece_${p}`;
+                                const myQty = userInventory[pieceId] || 0;
+                                const otherQty = otherInv[pieceId] || 0;
+
+                                const pieceName = `<b>${album.name}</b> / ${card.name} / ${p}. db`;
+
+                                if (myQty === 0 && otherQty >= 2) {
+                                    giveToMe.push(`🟢 ${pieceName}`); // Ő adja nekem
+                                }
+                                if (myQty >= 2 && otherQty === 0) {
+                                    takeFromMe.push(`🔵 ${pieceName}`); // Én adom neki
+                                }
+                            }
+                        });
+                    });
+
+                    // Ha bármelyik irányba van találat, kiírjuk a játékost!
+                    if (giveToMe.length > 0 || takeFromMe.length > 0) {
+                        hasMatches = true;
+                        resultsHtml += `<div class="match-card"><h4>👤 ${otherName}</h4>`;
+                        
+                        if (giveToMe.length > 0) {
+                            resultsHtml += `<div class="match-detail" style="border-left: 3px solid #6bc85f;">
+                                            <b>Tud adni neked:</b><br>${giveToMe.join('<br>')}</div>`;
+                        }
+                        if (takeFromMe.length > 0) {
+                            resultsHtml += `<div class="match-detail" style="border-left: 3px solid #4285F4;">
+                                            <b>Kéri tőled:</b><br>${takeFromMe.join('<br>')}</div>`;
+                        }
+                        resultsHtml += `</div>`;
+                    }
+                });
+
+                viewMatchmaker.innerHTML = '';
+                viewMatchmaker.appendChild(backBtn);
+                viewMatchmaker.insertAdjacentHTML('beforeend', `<h3>🤝 Cserepartnerek (${myAlliance})</h3>`);
+
+                if (hasMatches) {
+                    viewMatchmaker.insertAdjacentHTML('beforeend', resultsHtml);
+                } else {
+                    viewMatchmaker.insertAdjacentHTML('beforeend', `<p>Sajnos jelenleg nincs olyan klántársad, akivel oda-vissza cserélni tudnál.</p>`);
+                }
+
+            } catch (error) {
+                console.error(error);
+                viewMatchmaker.innerHTML = '<h3>❌ Hiba történt a keresés közben.</h3>';
+                viewMatchmaker.appendChild(backBtn);
             }
         });
     </script>
