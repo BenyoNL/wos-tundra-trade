@@ -25,7 +25,6 @@
         .list-item:active { transform: scale(0.98); }
         .card-item { background: rgba(224, 159, 62, 0.2); border-left: 4px solid #e09f3e; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 18px;}
         
-        /* ALBUM NÉZET ÉS FOLYAMATJELZŐ JAVÍTVA */
         .album-row { display: flex; align-items: center; justify-content: flex-start; width: 100%; }
         .album-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; margin-right: 20px; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.2); }
         .album-info { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
@@ -57,6 +56,12 @@
 
         #toast-msg { visibility: hidden; min-width: 250px; background-color: rgba(40, 167, 69, 0.95); color: #fff; text-align: center; border-radius: 8px; padding: 15px; position: fixed; z-index: 1000; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 18px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s, visibility 0.3s; pointer-events: none; backdrop-filter: blur(5px); }
         #toast-msg.show { visibility: visible; opacity: 1; }
+        
+        .match-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 15px; border-radius: 10px; margin: 15px auto; width: 90%; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.2);}
+        .match-card h4 { margin: 0 0 10px 0; color: #e09f3e; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; font-size: 20px;}
+        .match-detail { margin: 8px 0; font-size: 14px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px;}
+        .trade-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px;}
+        
         hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;}
     </style>
 </head>
@@ -97,17 +102,21 @@
                 <small style="color: #ccc;"><span class="t-state">State</span>: <b id="display-server" style="color:#fff;"></b> | <span class="t-alliance">Alliance</span>: <b id="display-alliance" style="color:#fff;"></b></small>
             </div>
             <div>
-                <select id="lang-selector" onchange="changeLanguage(this.value)">
+                <select id="lang-selector" onchange="window.changeLanguage(this.value)">
                     <option value="en" selected>🇬🇧 English</option>
                     <option value="hu">🇭🇺 Magyar</option>
                     <option value="de">🇩🇪 Deutsch</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="tr">🇹🇷 Türkçe</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="ar">🇸🇦 العربية</option>
                 </select>
             </div>
         </div>
         
         <div class="action-buttons">
-            <button onclick="runMatchmaker('alliance')" class="btn btn-blue t-btn-clan" style="width: 48%; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);">🤝 Search in Clan</button>
-            <button onclick="runMatchmaker('state')" class="btn btn-dark t-btn-state" style="width: 48%;">🌍 Search in State</button>
+            <button onclick="window.runMatchmaker('alliance')" class="btn btn-blue t-btn-clan" style="width: 48%; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);">🤝 Search in Clan</button>
+            <button onclick="window.runMatchmaker('state')" class="btn btn-dark t-btn-state" style="width: 48%;">🌍 Search in State</button>
         </div>
 
         <div id="search-bar">
@@ -131,6 +140,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // IDE MÁSOLD BE A SAJÁT KULCSODAT!
  const firebaseConfig = {
   apiKey: "AIzaSyDeEK5nOuvuELtGd61Q7W04uKGcJqG1L1U",
   authDomain: "tundra-album.firebaseapp.com",
@@ -140,7 +150,6 @@
   appId: "1:469371801375:web:71007b232a98fe8bdbea2a",
   measurementId: "G-2LQT9X23X5"
 };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -152,12 +161,17 @@
         let currentCardGlobal = null;
 
         const i18n = {
-            en: { state: "State", alliance: "Alliance", btnClan: "🤝 Search in Clan", btnState: "🌍 Search in State", searchPh: "🔍 Search album or card...", btnSave: "💾 Save Changes", btnLogout: "Logout", backAlbum: "⬅ Back to Albums", backCard: "⬅ Back to Cards", markDone: "✔ Set missing to 1", cardsOwnedInfo: "Completed Cards" },
-            hu: { state: "Állam", alliance: "Szövetség", btnClan: "🤝 Keresés Klánban", btnState: "🌍 Keresés Államban", searchPh: "🔍 Keresés albumra vagy kártyára...", btnSave: "💾 Változások Mentése", btnLogout: "Kijelentkezés", backAlbum: "⬅ Vissza az Albumokhoz", backCard: "⬅ Vissza a Kártyákhoz", markDone: "✔ Hiányzók 1-re állítása", cardsOwnedInfo: "Befejezett kártyák" },
-            de: { state: "Staat", alliance: "Allianz", btnClan: "🤝 Suche im Clan", btnState: "🌍 Suche im Staat", searchPh: "🔍 Album oder Karte suchen...", btnSave: "💾 Speichern", btnLogout: "Abmelden", backAlbum: "⬅ Zurück", backCard: "⬅ Zurück", markDone: "✔ Fehlende auf 1", cardsOwnedInfo: "Komplette Karten" }
+            en: { state: "State", alliance: "Alliance", btnClan: "🤝 Search in Clan", btnState: "🌍 Search in State", searchPh: "🔍 Search album or card...", btnSave: "💾 Save Changes", btnLogout: "Logout", backAlbum: "⬅ Back to Albums", backCard: "⬅ Back to Cards", markDone: "✔ Set missing to 1", cardsOwnedInfo: "Completed Cards", givesYou: "They can give you:", asksFrom: "They ask from you:", traded: "Traded!", noMatch: "No matching players found." },
+            hu: { state: "Állam", alliance: "Szövetség", btnClan: "🤝 Keresés Klánban", btnState: "🌍 Keresés Államban", searchPh: "🔍 Keresés albumra vagy kártyára...", btnSave: "💾 Változások Mentése", btnLogout: "Kijelentkezés", backAlbum: "⬅ Vissza az Albumokhoz", backCard: "⬅ Vissza a Kártyákhoz", markDone: "✔ Hiányzók 1-re állítása", cardsOwnedInfo: "Ezek a kártyák megvannak", givesYou: "Tud adni neked:", asksFrom: "Kéri tőled:", traded: "Elcseréltük!", noMatch: "Nincs találat a cserepartnerekre." },
+            de: { state: "Staat", alliance: "Allianz", btnClan: "🤝 Suche im Clan", btnState: "🌍 Suche im Staat", searchPh: "🔍 Album oder Karte suchen...", btnSave: "💾 Speichern", btnLogout: "Abmelden", backAlbum: "⬅ Zurück", backCard: "⬅ Zurück", markDone: "✔ Fehlende auf 1", cardsOwnedInfo: "Komplette Karten", givesYou: "Kann dir geben:", asksFrom: "Fragt von dir:", traded: "Gehandelt!", noMatch: "Keine passenden Spieler gefunden." },
+            fr: { state: "État", alliance: "Alliance", btnClan: "🤝 Chercher dans le Clan", btnState: "🌍 Chercher dans l'État", searchPh: "🔍 Chercher un album...", btnSave: "💾 Sauvegarder", btnLogout: "Déconnexion", backAlbum: "⬅ Retour", backCard: "⬅ Retour", markDone: "✔ Marquer manquants à 1", cardsOwnedInfo: "Cartes complètes", givesYou: "Peut vous donner:", asksFrom: "Vous demande:", traded: "Échangé!", noMatch: "Aucun joueur correspondant." },
+            tr: { state: "Eyalet", alliance: "İttifak", btnClan: "🤝 Klanda Ara", btnState: "🌍 Eyalette Ara", searchPh: "🔍 Albüm veya kart ara...", btnSave: "💾 Kaydet", btnLogout: "Çıkış Yap", backAlbum: "⬅ Albümlere Dön", backCard: "⬅ Kartlara Dön", markDone: "✔ Eksikleri 1 yap", cardsOwnedInfo: "Tamamlanan kartlar", givesYou: "Sana verebilir:", asksFrom: "Senden istiyor:", traded: "Takas edildi!", noMatch: "Eşleşen oyuncu bulunamadı." },
+            ru: { state: "Штат", alliance: "Альянс", btnClan: "🤝 Поиск в клане", btnState: "🌍 Поиск в штате", searchPh: "🔍 Поиск альбома или карты...", btnSave: "💾 Сохранить", btnLogout: "Выйти", backAlbum: "⬅ Назад", backCard: "⬅ Назад", markDone: "✔ Недостающие на 1", cardsOwnedInfo: "Собранные карты", givesYou: "Может дать вам:", asksFrom: "Просит у вас:", traded: "Обменялись!", noMatch: "Игроков не найдено." },
+            ar: { state: "حالة", alliance: "تحالف", btnClan: "🤝 البحث في العشيرة", btnState: "🌍 البحث في الولاية", searchPh: "🔍 البحث عن ألبوم أو بطاقة...", btnSave: "💾 حفظ التغييرات", btnLogout: "تسجيل خروج", backAlbum: "⬅ العودة للألبومات", backCard: "⬅ العودة للبطاقات", markDone: "✔ تعيين المفقود إلى 1", cardsOwnedInfo: "بطاقات مكتملة", givesYou: "يمكن أن يعطيك:", asksFrom: "يطلب منك:", traded: "تم التبادل!", noMatch: "لم يتم العثور على لاعبين." }
         };
         let currLang = 'en';
 
+        // --- GLOBÁLIS FUNKCIÓK A HTML GOMBOKHOZ ---
         window.changeLanguage = function(lang) {
             currLang = lang;
             document.querySelector('.t-state').textContent = i18n[lang].state;
@@ -168,40 +182,40 @@
             document.querySelector('.t-btn-save').textContent = i18n[lang].btnSave;
             document.querySelector('.t-btn-logout').textContent = i18n[lang].btnLogout;
             
-            if(document.getElementById('view-albums').style.display === 'block') renderAlbums();
-            if(document.getElementById('view-cards').style.display === 'block') renderCards(currentAlbumGlobal);
-            if(document.getElementById('view-puzzle').style.display === 'block') renderPuzzle(currentAlbumGlobal, currentCardGlobal);
+            if(document.getElementById('view-albums').style.display === 'block') window.renderAlbums();
+            if(document.getElementById('view-cards').style.display === 'block') window.renderCards(currentAlbumGlobal);
+            if(document.getElementById('view-puzzle').style.display === 'block') window.renderPuzzle(currentAlbumGlobal, currentCardGlobal);
         };
 
-        // --- ÚJ LOGIKA: ITT ADOD MEG A KÉPEK PONTOS NEVÉT ---
+        // ITT VAN MIND A 16 ALBUM! A képek neveit itt tudod átírni a sajátodra!
         const albumAdatok = [
-            { 
-                id: "album_0", 
-                kepFajlNev: "Rekindled_Flames.jpg", // Ide írd be a te fájlod nevét kiterjesztéssel!
-                en: "Rekindled Flames", de: "Wiederentfachte Flammen", hu: "Újraéledő Lángok" 
-            },
-            { 
-                id: "album_1", 
-                kepFajlNev: "Explore_the_World.png", // Lehet png is!
-                en: "Explore the World", de: "Erkunde die Welt", hu: "Fedezd fel a Világot" 
-            },
-            { 
-                id: "album_2", 
-                kepFajlNev: "Daybreak_Island.jpg", // Itt a te képed!
-                en: "Daybreak Island", de: "Insel des Tagesanbruchs", hu: "Hajnal Sziget" 
-            }
+            { id: "album_0", kepFajlNev: "album_0.jpg", en: "Rekindled Flames", de: "Wiederentfachte Flammen", hu: "Újraéledő Lángok", fr: "Flammes ravivées", tr: "Yeniden Alevlenen", ru: "Вновь зажженное", ar: "نيران مشتعلة" },
+            { id: "album_1", kepFajlNev: "album_1.jpg", en: "Explore the World", de: "Erkunde die Welt", hu: "Fedezd fel a Világot", fr: "Explorer le monde", tr: "Dünyayı Keşfet", ru: "Исследуй мир", ar: "استكشف العالم" },
+            { id: "album_2", kepFajlNev: "Daybreak_Island.jpg", en: "Daybreak Island", de: "Insel des Tagesanbruchs", hu: "Hajnal Sziget", fr: "Île de l'Aube", tr: "Şafak Adası", ru: "Остров Рассвета", ar: "جزيرة الفجر" },
+            { id: "album_3", kepFajlNev: "album_3.jpg", en: "Tundra Alliance", de: "Tundra-Allianz", hu: "Tundra Szövetség", fr: "Alliance de la Toundra", tr: "Tundra İttifakı", ru: "Альянс Тундры", ar: "تحالف التندرا" },
+            { id: "album_4", kepFajlNev: "album_4.jpg", en: "Battlefield Epic", de: "Schlachtfeld-Epos", hu: "Csatatéri Eposz", fr: "Épopée du champ de bataille", tr: "Savaş Alanı Destanı", ru: "Эпос поля боя", ar: "ملحمة ساحة المعركة" },
+            { id: "album_5", kepFajlNev: "album_5.jpg", en: "Spectacular Adventures", de: "Spektakuläre Abenteuer", hu: "Különleges Kalandok", fr: "Aventures spectaculaires", tr: "Muhteşem Maceralar", ru: "Захватывающие приключения", ar: "مغامرات مذهلة" },
+            { id: "album_6", kepFajlNev: "album_6.jpg", en: "Divine Weapons", de: "Göttliche Waffen", hu: "Isteni Fegyverek", fr: "Armes divines", tr: "İlahi Silahlar", ru: "Божественное оружие", ar: "أسلحة إلهية" },
+            { id: "album_7", kepFajlNev: "album_7.jpg", en: "Song of Heroes", de: "Heldenlied", hu: "Hősök Éneke", fr: "Chant des Héros", tr: "Kahramanların Şarkısı", ru: "Песнь Героев", ar: "أغنية الأبطال" },
+            { id: "album_8", kepFajlNev: "album_8.jpg", en: "The Labyrinth", de: "Das Labyrinth", hu: "A Labirintus", fr: "Le Labyrinthe", tr: "Labirent", ru: "Лабиринт", ar: "المتاهة" },
+            { id: "album_9", kepFajlNev: "album_9.jpg", en: "Nature’s Strength", de: "Kraft der Natur", hu: "A Természet Ereje", fr: "Force de la Nature", tr: "Doğanın Gücü", ru: "Сила природы", ar: "قوة الطبيعة" },
+            { id: "album_10", kepFajlNev: "album_10.jpg", en: "Crystalline Mysteries", de: "Kristalline Geheimnisse", hu: "Kristályos Rejtélyek", fr: "Mystères Cristallins", tr: "Kristal Gizemler", ru: "Кристальные тайны", ar: "أسرار بلورية" },
+            { id: "album_11", kepFajlNev: "album_11.jpg", en: "Ballad of Wind and Cold", de: "Ballade von Wind und Kälte", hu: "A Szél és Hideg Balladája", fr: "Ballade du Vent", tr: "Rüzgarın Baladı", ru: "Баллада о Ветре", ar: "أغنية الريح" },
+            { id: "album_12", kepFajlNev: "album_12.jpg", en: "Infernal Power", de: "Höllenmacht", hu: "Pokoli Erő", fr: "Puissance Infernale", tr: "Cehennem Gücü", ru: "Адская сила", ar: "قوة جهنمية" },
+            { id: "album_13", kepFajlNev: "album_13.jpg", en: "Prerogative of the Flame", de: "Vorrecht der Flamme", hu: "A Láng Előjoga", fr: "Prérogative de la Flamme", tr: "Alevin Ayrıcalığı", ru: "Прерогатива Пламени", ar: "امتياز اللهب" },
+            { id: "album_14", kepFajlNev: "album_14.jpg", en: "Frostdragon Empire", de: "Frostdrachen-Imperium", hu: "Fagysárkány Birodalom", fr: "Empire du Dragon de Givre", tr: "Buz Ejderhası İmparatorluğu", ru: "Империя Ледяного Дракона", ar: "إمبراطورية تنين الصقيع" },
+            { id: "album_15", kepFajlNev: "album_15.jpg", en: "Kings of Combat", de: "Könige des Kampfes", hu: "A Harc Királyai", fr: "Rois du Combat", tr: "Savaş Kralları", ru: "Короли Битвы", ar: "ملوك القتال" }
         ];
 
-        // A rendszer automatikusan összerakja az adatbázist
         const gameData = albumAdatok.map((album) => {
             return {
                 id: album.id,
-                image: `images/${album.kepFajlNev}`, // Automatikusan keresi az images/ mappában a megadott nevet
-                names: { en: album.en, hu: album.hu, de: album.de },
+                image: `images/${album.kepFajlNev}`, 
+                names: { en: album.en, hu: album.hu, de: album.de, fr: album.fr, tr: album.tr, ru: album.ru, ar: album.ar },
                 cards: Array.from({length: 9}, (_, cIdx) => ({ 
                     id: `${album.id}_card_${cIdx+1}`, 
                     name: `Card ${cIdx+1}`,
-                    pieceCount: 15 // Kártyák darabszáma
+                    pieceCount: 15 // Ezt majd kártyánként módosítjuk a végén!
                 }))
             };
         });
@@ -215,20 +229,38 @@
             screen.style.display = 'block';
         }
 
+        document.getElementById('email-register-btn').addEventListener('click', () => createUserWithEmailAndPassword(auth, document.getElementById('email-input').value, document.getElementById('password-input').value).catch(e => document.getElementById('auth-error').textContent = e.message));
+        document.getElementById('email-login-btn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email-input').value, document.getElementById('password-input').value).catch(e => document.getElementById('auth-error').textContent = "Incorrect login details."));
+        document.getElementById('google-login-btn').addEventListener('click', () => signInWithPopup(auth, provider).catch(e => console.error(e)));
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+
+        document.getElementById('save-profile-btn').addEventListener('click', async () => {
+            const pName = document.getElementById('player-name').value.trim();
+            const pServer = document.getElementById('server-number').value.trim();
+            const pAlliance = document.getElementById('alliance-name').value.trim().toUpperCase();
+            if(!pName || !pServer || !pAlliance) return document.getElementById('profile-error').textContent = "Please fill all fields!";
+            if(pServer.length !== 4 || isNaN(pServer)) return document.getElementById('profile-error').textContent = "State must be 4 digits.";
+            if(pAlliance.length !== 3) return document.getElementById('profile-error').textContent = "Alliance must be 3 characters.";
+            await setDoc(doc(db, "jatekosok", currentUserUid), { jatekNev: pName, szerver: pServer, szovetseg: pAlliance, inventory: {} });
+            checkUserProfile(currentUserUid);
+        });
+
+        async function checkUserProfile(uid) {
+            const docSnap = await getDoc(doc(db, "jatekosok", uid));
+            if (docSnap.exists() && docSnap.data().szerver) {
+                const data = docSnap.data();
+                document.getElementById('display-name').textContent = data.jatekNev || data.nev;
+                document.getElementById('display-server').textContent = data.szerver;
+                document.getElementById('display-alliance').textContent = data.szovetseg;
+                userInventory = data.inventory || {}; 
+                window.renderAlbums(); 
+                showScreen(mainScreen);
+            } else { showScreen(profileScreen); }
+        }
+
         onAuthStateChanged(auth, async (user) => {
-            if (user) { 
-                currentUserUid = user.uid; 
-                const docSnap = await getDoc(doc(db, "jatekosok", user.uid));
-                if (docSnap.exists() && docSnap.data().szerver) {
-                    const data = docSnap.data();
-                    document.getElementById('display-name').textContent = data.jatekNev || data.nev;
-                    document.getElementById('display-server').textContent = data.szerver;
-                    document.getElementById('display-alliance').textContent = data.szovetseg;
-                    userInventory = data.inventory || {}; 
-                    renderAlbums(); 
-                    showScreen(mainScreen);
-                } else { showScreen(profileScreen); }
-            } else { currentUserUid = null; showScreen(authScreen); }
+            if (user) { currentUserUid = user.uid; checkUserProfile(user.uid); } 
+            else { currentUserUid = null; showScreen(authScreen); }
         });
 
         const viewAlbums = document.getElementById('view-albums');
@@ -236,23 +268,19 @@
         const viewPuzzle = document.getElementById('view-puzzle');
         function hideAllViews() { viewAlbums.style.display = 'none'; viewCards.style.display = 'none'; viewPuzzle.style.display = 'none'; document.getElementById('view-matchmaker').style.display='none'; document.getElementById('view-search-results').style.display='none'; }
 
-        // --- ALBUMOK RENDERELÉSE (Zöld csík logika) ---
-        function renderAlbums() {
+        window.renderAlbums = function() {
             hideAllViews();
             currentAlbumGlobal = null; currentCardGlobal = null;
             viewAlbums.innerHTML = '';
             
             gameData.forEach(album => {
                 const aName = album.names[currLang] || album.names['en'];
-                
                 let completedCards = 0;
                 album.cards.forEach(card => {
                     let isComplete = true;
                     for(let p = 1; p <= card.pieceCount; p++) {
                         const pid = `${card.id}_piece_${p}`;
-                        if(!userInventory[pid] || userInventory[pid] === 0) {
-                            isComplete = false; break;
-                        }
+                        if(!userInventory[pid] || userInventory[pid] === 0) { isComplete = false; break; }
                     }
                     if(isComplete) completedCards++;
                 });
@@ -261,7 +289,7 @@
 
                 const btn = document.createElement('div');
                 btn.className = 'list-item';
-                btn.onclick = () => renderCards(album);
+                btn.onclick = () => window.renderCards(album);
                 
                 btn.innerHTML = `
                     <div class="album-row">
@@ -271,25 +299,24 @@
                             <div class="progress-bg">
                                 <div class="progress-bar" style="width: ${progressPct}%"></div>
                             </div>
-                            <div class="progress-text">${completedCards} / ${album.cards.length} kész</div>
+                            <div class="progress-text">${completedCards} / ${album.cards.length}</div>
                         </div>
                     </div>
                 `;
                 viewAlbums.appendChild(btn);
             });
             viewAlbums.style.display = 'block';
-        }
+        };
 
-        // --- KÁRTYÁK RENDERELÉSE (JAVÍTOTT VÉLETLEN PIPA LOGIKA) ---
-        function renderCards(album) {
+        window.renderCards = function(album) {
             hideAllViews();
             currentAlbumGlobal = album;
             viewCards.innerHTML = '';
             const aName = album.names[currLang] || album.names['en'];
 
-            viewCards.innerHTML += `<button class="btn btn-back" onclick="renderAlbums()">${i18n[currLang].backAlbum}</button>
+            viewCards.innerHTML += `<button class="btn btn-back" onclick="window.renderAlbums()">${i18n[currLang].backAlbum}</button>
                                     <h3 style="text-align:left; margin-top:0;">📖 ${aName}</h3>
-                                    <p style="text-align:right; font-size:13px; color:#ccc; margin-bottom:5px;">${i18n[currLang].cardsOwnedInfo} ⬇</p>`;
+                                    <p style="text-align:right; font-size:12px; color:#aaa; margin-bottom:5px;">${i18n[currLang].cardsOwnedInfo} ⬇</p>`;
             
             album.cards.forEach(card => {
                 let isComplete = true;
@@ -301,36 +328,34 @@
                 const row = document.createElement('div');
                 row.className = 'list-item card-item';
                 row.innerHTML = `<span style="flex-grow:1; text-align:left;">${card.name}</span>`;
-                row.onclick = () => renderPuzzle(album, card);
+                row.onclick = () => window.renderPuzzle(album, card);
                 
                 const fastFillBtn = document.createElement('div');
                 fastFillBtn.className = `check-btn ${isComplete ? 'checked' : 'unchecked'}`;
                 fastFillBtn.innerHTML = '✔';
                 
-                // ITT VAN A JAVÍTÁS: Most már ki tudod venni a pipát!
+                // Kapcsoló (Toggle) működés!
                 fastFillBtn.onclick = (e) => {
                     e.stopPropagation(); 
                     if(isComplete) {
-                        // Ha teli volt, akkor nullázzuk (kivesszük a pipát)
                         for(let p = 1; p <= card.pieceCount; p++) {
                             const pid = `${card.id}_piece_${p}`;
                             userInventory[pid] = 0;
                         }
                     } else {
-                        // Ha üres volt, feltöltjük 1-esekkel
                         for(let p = 1; p <= card.pieceCount; p++) {
                             const pid = `${card.id}_piece_${p}`;
                             if(!userInventory[pid] || userInventory[pid] === 0) userInventory[pid] = 1;
                         }
                     }
-                    renderCards(album); 
+                    window.renderCards(album); 
                 };
                 
                 row.appendChild(fastFillBtn);
                 viewCards.appendChild(row);
             });
             viewCards.style.display = 'block';
-        }
+        };
 
         window.renderPuzzle = function(album, card) {
             hideAllViews();
@@ -339,8 +364,8 @@
             const aName = album.names[currLang] || album.names['en'];
 
             viewPuzzle.innerHTML += `<div style="display:flex; justify-content:space-between;">
-                                        <button class="btn btn-back" onclick="renderCards(currentAlbumGlobal)" style="margin:0;">${i18n[currLang].backCard}</button>
-                                        <button class="btn btn-green btn-small" style="margin:0;" onclick="fillCurrentCard()">${i18n[currLang].markDone}</button>
+                                        <button class="btn btn-back" onclick="window.renderCards(currentAlbumGlobal)" style="margin:0;">${i18n[currLang].backCard}</button>
+                                        <button class="btn btn-green btn-small" style="margin:0;" onclick="window.fillCurrentCard()">${i18n[currLang].markDone}</button>
                                      </div>
                                      <h3 style="text-align:left;"><small style="color:#e09f3e;">${aName}</small><br>${card.name}</h3>`;
             
@@ -362,8 +387,8 @@
                 pieceDiv.tabIndex = 0; 
                 
                 pieceDiv.onkeydown = (e) => {
-                    if (e.key === 'ArrowUp') { updateQty(pieceId, 1); e.preventDefault(); }
-                    if (e.key === 'ArrowDown') { updateQty(pieceId, -1); e.preventDefault(); }
+                    if (e.key === 'ArrowUp') { window.updateQty(pieceId, 1); e.preventDefault(); }
+                    if (e.key === 'ArrowDown') { window.updateQty(pieceId, -1); e.preventDefault(); }
                     if (e.key === 'ArrowRight') { if(pieceDiv.nextElementSibling) pieceDiv.nextElementSibling.focus(); e.preventDefault(); }
                     if (e.key === 'ArrowLeft') { if(pieceDiv.previousElementSibling) pieceDiv.previousElementSibling.focus(); e.preventDefault(); }
                 };
@@ -371,23 +396,23 @@
                 pieceDiv.innerHTML = `
                     <div class="piece-shape">${p}</div>
                     <div class="controls">
-                        <button tabindex="-1" class="qty-btn minus" onclick="updateQty('${pieceId}', -1); document.getElementById('box-${pieceId}').focus();">-</button>
+                        <button tabindex="-1" class="qty-btn minus" onclick="window.updateQty('${pieceId}', -1); document.getElementById('box-${pieceId}').focus();">-</button>
                         <span class="qty-display" id="qty-${pieceId}">${displayQty}</span>
-                        <button tabindex="-1" class="qty-btn plus" onclick="updateQty('${pieceId}', 1); document.getElementById('box-${pieceId}').focus();">+</button>
+                        <button tabindex="-1" class="qty-btn plus" onclick="window.updateQty('${pieceId}', 1); document.getElementById('box-${pieceId}').focus();">+</button>
                     </div>
                 `;
                 grid.appendChild(pieceDiv);
             }
             viewPuzzle.appendChild(grid);
             viewPuzzle.style.display = 'block';
-        }
+        };
 
         window.fillCurrentCard = function() {
             for(let p = 1; p <= currentCardGlobal.pieceCount; p++) {
                 const pid = `${currentCardGlobal.id}_piece_${p}`;
                 if(!userInventory[pid] || userInventory[pid] === 0) userInventory[pid] = 1; 
             }
-            renderPuzzle(currentAlbumGlobal, currentCardGlobal); 
+            window.renderPuzzle(currentAlbumGlobal, currentCardGlobal); 
         };
 
         window.updateQty = function(pieceId, change) {
@@ -414,6 +439,95 @@
                 setTimeout(() => toast.classList.remove("show"), 2000);
             } catch (error) { console.error(error); }
         });
+
+        // MATCHMAKER LOGIKA (CSERE MOTOR)
+        window.runMatchmaker = async function(scope) {
+            hideAllViews();
+            const viewMatchmaker = document.getElementById('view-matchmaker');
+            viewMatchmaker.innerHTML = '<h3>⏳...</h3>';
+            viewMatchmaker.style.display = 'block';
+
+            const backBtn = document.createElement('button');
+            backBtn.className = 'btn btn-back';
+            backBtn.textContent = i18n[currLang].backAlbum;
+            backBtn.onclick = () => window.renderAlbums();
+
+            try {
+                const myServer = document.getElementById('display-server').textContent;
+                const myAlliance = document.getElementById('display-alliance').textContent;
+
+                let q = (scope === 'alliance') 
+                    ? query(collection(db, "jatekosok"), where("szerver", "==", myServer), where("szovetseg", "==", myAlliance))
+                    : query(collection(db, "jatekosok"), where("szerver", "==", myServer));
+                
+                const querySnapshot = await getDocs(q);
+
+                let resultsHtml = '';
+                let hasMatches = false;
+
+                querySnapshot.forEach((userDoc) => {
+                    if (userDoc.id === currentUserUid) return; 
+
+                    const otherData = userDoc.data();
+                    const otherInv = otherData.inventory || {};
+                    const otherName = `${otherData.jatekNev || otherData.nev} [${otherData.szovetseg}]`; 
+
+                    let giveToMe = []; 
+                    let takeFromMe = []; 
+
+                    gameData.forEach(album => {
+                        const aName = album.names[currLang] || album.names['en'];
+                        album.cards.forEach(card => {
+                            for(let p = 1; p <= card.pieceCount; p++) {
+                                const pieceId = `${card.id}_piece_${p}`;
+                                const myQty = userInventory[pieceId] || 0;
+                                const otherQty = otherInv[pieceId] || 0;
+                                const pieceName = `<b>${aName}</b><br>${card.name} / ${p}.`;
+
+                                if (myQty === 0 && otherQty >= 2) {
+                                    giveToMe.push(`<div class="trade-row"><span>🟢 ${pieceName}</span><button class="btn btn-green btn-small" onclick="window.executeTrade('${userDoc.id}', '${pieceId}', 'receive', this)">${i18n[currLang].traded}</button></div>`);
+                                }
+                                if (myQty >= 2 && otherQty === 0) {
+                                    takeFromMe.push(`<div class="trade-row"><span>🔵 ${pieceName}</span><button class="btn btn-blue btn-small" onclick="window.executeTrade('${userDoc.id}', '${pieceId}', 'give', this)">${i18n[currLang].traded}</button></div>`);
+                                }
+                            }
+                        });
+                    });
+
+                    if (giveToMe.length > 0 || takeFromMe.length > 0) {
+                        hasMatches = true;
+                        resultsHtml += `<div class="match-card"><h4>👤 ${otherName}</h4>`;
+                        if (giveToMe.length > 0) resultsHtml += `<div class="match-detail" style="border-left: 3px solid #28a745;"><b style="color:#28a745;">${i18n[currLang].givesYou}</b><br>${giveToMe.join('')}</div>`;
+                        if (takeFromMe.length > 0) resultsHtml += `<div class="match-detail" style="border-left: 3px solid #4285F4;"><b style="color:#4285F4;">${i18n[currLang].asksFrom}</b><br>${takeFromMe.join('')}</div>`;
+                        resultsHtml += `</div>`;
+                    }
+                });
+
+                viewMatchmaker.innerHTML = '';
+                viewMatchmaker.appendChild(backBtn);
+                viewMatchmaker.insertAdjacentHTML('beforeend', `<h3>🤝 ${scope === 'alliance' ? myAlliance : myServer}</h3>`);
+
+                if (hasMatches) viewMatchmaker.insertAdjacentHTML('beforeend', resultsHtml);
+                else viewMatchmaker.insertAdjacentHTML('beforeend', `<p>${i18n[currLang].noMatch}</p>`);
+
+            } catch (error) { viewMatchmaker.innerHTML = '<h3>❌ Error</h3>'; viewMatchmaker.appendChild(backBtn); }
+        };
+
+        window.executeTrade = async function(otherUid, pieceId, type, btnElement) {
+            if(!confirm("Are you sure? This updates both inventories!")) return;
+            btnElement.disabled = true;
+            btnElement.textContent = "⏳...";
+
+            try {
+                let myChange = (type === 'give') ? -1 : 1;
+                let otherChange = (type === 'give') ? 1 : -1;
+                await updateDoc(doc(db, "jatekosok", currentUserUid), { [`inventory.${pieceId}`]: increment(myChange) });
+                await updateDoc(doc(db, "jatekosok", otherUid), { [`inventory.${pieceId}`]: increment(otherChange) });
+                userInventory[pieceId] = (userInventory[pieceId] || 0) + myChange;
+                btnElement.textContent = "✅";
+                btnElement.style.backgroundColor = "#555";
+            } catch(error) { alert("Trade error!"); btnElement.disabled = false; btnElement.textContent = i18n[currLang].traded; }
+        };
     </script>
 </body>
 </html>
