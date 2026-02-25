@@ -25,7 +25,7 @@
         .list-item:active { transform: scale(0.98); }
         
         .album-card { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
-        .album-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; margin-right: 20px; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.2); }
+        .album-img-large { width: 100%; max-height: 280px; height: auto; object-fit: contain; border-bottom: 3px solid #e09f3e; background: rgba(0,0,0,0.8); display: block; }
         .album-info-box { padding: 20px; box-sizing: border-box; width: 100%; }
         .album-title-large { font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 15px; text-align: center; }
         
@@ -439,7 +439,7 @@ updateTradeBadges();
                 btn.onclick = () => renderCards(album);
                 
                 btn.innerHTML = `
-                    <img src="${album.image}" class="album-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23555%22/%3E%3Ctext x=%2250%22 y=%2255%22 font-family=%22Arial%22 font-size=%2230%22 fill=%22%23fff%22 text-anchor=%22middle%22%3E?%3C/text%3E%3C/svg%3E'">
+                    <img src="${album.image}" class="album-img-large" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23555%22/%3E%3Ctext x=%2250%22 y=%2255%22 font-family=%22Arial%22 font-size=%2230%22 fill=%22%23fff%22 text-anchor=%22middle%22%3E?%3C/text%3E%3C/svg%3E'">
                     <div class="album-info-box">
                         <div class="album-title-large">${aName}</div>
                         <div class="progress-bg">
