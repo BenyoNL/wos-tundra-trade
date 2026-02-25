@@ -187,26 +187,56 @@ const firebaseConfig = {
         };
         window.currLang = 'en';
 
-        // --- AZ ALBUMOK ÉS KÉPEK ---
+// --- AZ ALBUMOK ÉS KÉPEK ---
         const albumAdatok = [
-            { id: "album_0", kepFajlNev: "album_0.jpg", en: "Rekindled Flames", de: "Wiederentfachte Flammen", hu: "Újraéledő Lángok", fr: "Flammes ravivées", tr: "Yeniden Alevlenen", ru: "Вновь зажженное", ar: "نيران مشتعلة" },
-            { id: "album_1", kepFajlNev: "album_1.jpg", en: "Explore the World", de: "Erkunde die Welt", hu: "Fedezd fel a Világot", fr: "Explorer le monde", tr: "Dünyayı Keşfet", ru: "Исследуй мир", ar: "استكشف العالم" },
+            { id: "album_0", kepFajlNev: "Rekindled_Flames.jpg", en: "Rekindled Flames", de: "Wiederentfachte Flammen", hu: "Újraéledő Lángok", fr: "Flammes ravivées", tr: "Yeniden Alevlenen", ru: "Вновь зажженное", ar: "نيران مشتعلة",
+              kartyaNevek: ["Furnace", "City Founding", "Dawn Alliance", "Decisions", "Menace Afoot", "Heroes", "Food Power", "A New Order", "True Explorer"]
+            },
+            { id: "album_1", kepFajlNev: "Explore_the_World.jpg", en: "Explore the World", de: "Erkunde die Welt", hu: "Fedezd fel a Világot", fr: "Explorer le monde", tr: "Dünyayı Keşfet", ru: "Исследуй мир", ar: "استكشف العالم",
+              kartyaNevek: ["War on Winter", "Exploration Journal", "Hunting Guild", "The Raging Bear", "Treasure Kingdom", "Wealth Is Knowledge", "Ruins of Old", "Cryptid Days", "Call of the Stars"]
+            },
             { id: "album_2", kepFajlNev: "Daybreak_Island.jpg", en: "Daybreak Island", de: "Insel des Tagesanbruchs", hu: "Hajnal Sziget", fr: "Île de l'Aube", tr: "Şafak Adası", ru: "Остров Рассвета", ar: "جزيرة الفجر",
               kartyaNevek: ["Daybreak Island Legend", "Island of Dreams", "Tree of Life", "Call of the Sea", "Distant Resonance", "Caravan Visit", "New Home", "Daybreak Song", "Island Splendors"] 
             },
-            { id: "album_3", kepFajlNev: "album_3.jpg", en: "Tundra Alliance", de: "Tundra-Allianz", hu: "Tundra Szövetség", fr: "Alliance de la Toundra", tr: "Tundra İttifakı", ru: "Альянс Тундры", ar: "تحالف التندرا" },
-            { id: "album_4", kepFajlNev: "album_4.jpg", en: "Battlefield Epic", de: "Schlachtfeld-Epos", hu: "Csatatéri Eposz", fr: "Épopée du champ de bataille", tr: "Savaş Alanı Destanı", ru: "Эпос поля боя", ar: "ملحمة ساحة المعركة" },
-            { id: "album_5", kepFajlNev: "album_5.jpg", en: "Spectacular Adventures", de: "Spektakuläre Abenteuer", hu: "Különleges Kalandok", fr: "Aventures spectaculaires", tr: "Muhteşem Maceralar", ru: "Захватывающие приключения", ar: "مغامرات مذهلة" },
-            { id: "album_6", kepFajlNev: "album_6.jpg", en: "Divine Weapons", de: "Göttliche Waffen", hu: "Isteni Fegyverek", fr: "Armes divines", tr: "İlahi Silahlar", ru: "Божественное оружие", ar: "أسلحة إلهية" },
-            { id: "album_7", kepFajlNev: "album_7.jpg", en: "Song of Heroes", de: "Heldenlied", hu: "Hősök Éneke", fr: "Chant des Héros", tr: "Kahramanların Şarkısı", ru: "Песнь Героев", ar: "أغنية الأبطال" },
-            { id: "album_8", kepFajlNev: "album_8.jpg", en: "The Labyrinth", de: "Das Labyrinth", hu: "A Labirintus", fr: "Le Labyrinthe", tr: "Labirent", ru: "Лабиринт", ar: "المتاهة" },
-            { id: "album_9", kepFajlNev: "album_9.jpg", en: "Nature’s Strength", de: "Kraft der Natur", hu: "A Természet Ereje", fr: "Force de la Nature", tr: "Doğanın Gücü", ru: "Сила природы", ar: "قوة الطبيعة" },
-            { id: "album_10", kepFajlNev: "album_10.jpg", en: "Crystalline Mysteries", de: "Kristalline Geheimnisse", hu: "Kristályos Rejtélyek", fr: "Mystères Cristallins", tr: "Kristal Gizemler", ru: "Кристальные тайны", ar: "أسرار بلورية" },
-            { id: "album_11", kepFajlNev: "album_11.jpg", en: "Ballad of Wind and Cold", de: "Ballade von Wind und Kälte", hu: "A Szél és Hideg Balladája", fr: "Ballade du Vent", tr: "Rüzgarın Baladı", ru: "Баллада о Ветре", ar: "أغنية الريح" },
-            { id: "album_12", kepFajlNev: "album_12.jpg", en: "Infernal Power", de: "Höllenmacht", hu: "Pokoli Erő", fr: "Puissance Infernale", tr: "Cehennem Gücü", ru: "Адская сила", ar: "قوة جهنمية" },
-            { id: "album_13", kepFajlNev: "album_13.jpg", en: "Prerogative of the Flame", de: "Vorrecht der Flamme", hu: "A Láng Előjoga", fr: "Prérogative de la Flamme", tr: "Alevin Ayrıcalığı", ru: "Прерогатива Пламени", ar: "امتياز اللهب" },
-            { id: "album_14", kepFajlNev: "album_14.jpg", en: "Frostdragon Empire", de: "Frostdrachen-Imperium", hu: "Fagysárkány Birodalom", fr: "Empire du Dragon de Givre", tr: "Buz Ejderhası İmparatorluğu", ru: "Империя Ледяного Дракона", ar: "إمبراطورية تنين الصقيع" },
-            { id: "album_15", kepFajlNev: "album_15.jpg", en: "Kings of Combat", de: "Könige des Kampfes", hu: "A Harc Királyai", fr: "Rois du Combat", tr: "Savaş Kralları", ru: "Короли Битвы", ar: "ملوك القتال" }
+            { id: "album_3", kepFajlNev: "Tundra_Alliance.jpg", en: "Tundra Alliance", de: "Tundra-Allianz", hu: "Tundra Szövetség", fr: "Alliance de la Toundra", tr: "Tundra İttifakı", ru: "Альянс Тундры", ar: "تحالف التندرا",
+              kartyaNevek: ["Alliance-Building", "One Heart", "Heroes' Aid", "Alliance Resources", "Twisted Obsession", "Virtues and Crimes", "Children of the \"New World\"", "Horn of Command", "Battlefield Epic"]
+            },
+            { id: "album_4", kepFajlNev: "Battlefield_Epic.jpg", en: "Battlefield Epic", de: "Schlachtfeld-Epos", hu: "Csatatéri Eposz", fr: "Épopée du champ de bataille", tr: "Savaş Alanı Destanı", ru: "Эпос поля боя", ar: "ملحمة ساحة المعركة",
+              kartyaNevek: ["Imperial Foundry", "King of the Battlefield", "Orichalcum", "City of Kings", "Pilot's Paradise", "Great Contest", "Canyon Clash", "Hero's Glory", "Grand Banquet"]
+            },
+            { id: "album_5", kepFajlNev: "Spectacular_Adventures.jpg", en: "Spectacular Adventures", de: "Spektakuläre Abenteuer", hu: "Különleges Kalandok", fr: "Aventures spectaculaires", tr: "Muhteşem Maceralar", ru: "Захватывающие приключения", ar: "مغامرات مذهلة",
+              kartyaNevek: ["Fishing Tournament", "Snowbusters", "Bandit", "Red-Haired Joe", "A \"Queen\" Arises", "The Eagles", "Bounty Hunter", "Wandering Merchant", "Tundra Adventure"]
+            },
+            { id: "album_6", kepFajlNev: "Divine_Weapons.jpg", en: "Divine Weapons", de: "Göttliche Waffen", hu: "Isteni Fegyverek", fr: "Armes divines", tr: "İlahi Silahlar", ru: "Божественное оружие", ar: "أسلحة إلهية",
+              kartyaNevek: ["Master Blacksmith", "Legendary Divine Weapon", "Tundra Trade Route", "Merchant Escort", "Cryptid Invasion", "Steam Rhapsody", "Ice Journey", "Exotic Charm", "Essence Stones"]
+            },
+            { id: "album_7", kepFajlNev: "Song_of_Heroes.jpg", en: "Song of Heroes", de: "Heldenlied", hu: "Hősök Éneke", fr: "Chant des Héros", tr: "Kahramanların Şarkısı", ru: "Песнь Героев", ar: "أغنية الأبطال",
+              kartyaNevek: ["Dauntless Heroes", "Snow Angel", "Everyday Champions", "Arcadia's Legacy", "\"I Am the Fire.\"", "Artisan Architect", "Life Vs Death", "The Icebreakers", "Epic of a New World"]
+            },
+            { id: "album_8", kepFajlNev: "The_Labyrinth.jpg", en: "The Labyrinth", de: "Das Labyrinth", hu: "A Labirintus", fr: "Le Labyrinthe", tr: "Labirent", ru: "Лабиринт", ar: "المتاهة",
+              kartyaNevek: ["Underworld Mysteries", "The World Below", "Digging To Danger", "Fungal Forest", "Furnace of the Gods", "The Undergrounders", "The Project", "Gaia Heart", "The Deepest Echo"]
+            },
+            { id: "album_9", kepFajlNev: "Nature's_Strength.jpg", en: "Nature’s Strength", de: "Kraft der Natur", hu: "A Természet Ereje", fr: "Force de la Nature", tr: "Doğanın Gücü", ru: "Сила природы", ar: "قوة الطبيعة",
+              kartyaNevek: ["Friend of Nature", "Wild At Heart", "Beast Unleashed", "Wild Legion", "Pets-In-Arms", "Master Tamer", "Superhuman Strength", "Kasia's Struggle", "Call of the Wild"]
+            },
+            { id: "album_10", kepFajlNev: "Crystalline_Mysteries.jpg", en: "Crystalline Mysteries", de: "Kristalline Geheimnisse", hu: "Kristályos Rejtélyek", fr: "Mystères Cristallins", tr: "Kristal Gizemler", ru: "Кристальные тайны", ar: "أسرار بلورية",
+              kartyaNevek: ["Fiery Crystal", "Mining the Fire", "Heirs of Empire", "Sins of Empire", "Fire Reborn", "The Burning Legion", "Promises of Fire", "Crystalline Rage", "Fire Crystal Era"]
+            },
+            { id: "album_11", kepFajlNev: "Ballad_of_Wind_and_Cold.jpg", en: "Ballad of Wind and Cold", de: "Ballade von Wind und Kälte", hu: "A Szél és Hideg Balladája", fr: "Ballade du Vent", tr: "Rüzgarın Baladı", ru: "Баллада о Ветре", ar: "أغنية الريح",
+              kartyaNevek: ["Honor and Glory", "Cold Highways", "Words of the Forgotten", "Monument to the", "Alliance Showdown", "State Versus State", "The Summit of Battle", "Castle of Conflict", "Remaker of Order"]
+            },
+            { id: "album_12", kepFajlNev: "Infernal_Power.jpg", en: "Infernal Power", de: "Höllenmacht", hu: "Pokoli Erő", fr: "Puissance Infernale", tr: "Cehennem Gücü", ru: "Адская сила", ar: "قوة جهنمية",
+              kartyaNevek: ["Helios Warriors", "Crystal Strength", "Crystal Fragmentation", "Miner Madness", "Engine of the Future", "Risky Business", "Treasure of Empire", "The Communicative Heart", "The Guardians"]
+            },
+            { id: "album_13", kepFajlNev: "Prerogative_of_the_Flame.jpg", en: "Prerogative of the Flame", de: "Vorrecht der Flamme", hu: "A Láng Előjoga", fr: "Prérogative de la Flamme", tr: "Alevin Ayrıcalığı", ru: "Прерогатива Пламени", ar: "امتياز اللهب",
+              kartyaNevek: ["Whispers of the World", "Temptations of Power", "Doomsday Man", "The Hunters", "The Mad King", "The Last Empress", "The Last Collapse", "A Long Slumber", "Sky City"]
+            },
+            { id: "album_14", kepFajlNev: "Frostdragon_Empire.jpg", en: "Frostdragon Empire", de: "Frostdrachen-Imperium", hu: "Fagysárkány Birodalom", fr: "Empire du Dragon de Givre", tr: "Buz Ejderhası İmparatorluğu", ru: "Империя Ледяного Дракона", ar: "إمبراطورية تنين الصقيع",
+              kartyaNevek: ["Frostdragon Empire", "The Dragonic Legend", "Wings of Empire", "The Dragonic Legion", "Rediscovery", "Future Vision", "War and Wealth", "Banquet for a King", "A Tyrant Crowned"]
+            },
+            { id: "album_15", kepFajlNev: "Kings_of_Combat.jpg", en: "Kings of Combat", de: "Könige des Kampfes", hu: "A Harc Királyai", fr: "Rois du Combat", tr: "Savaş Kralları", ru: "Короли Битвы", ar: "ملوك القتال",
+              kartyaNevek: ["League of Honor", "A Tournament of Heroes", "Duel of Greatness", "The Callisto", "Kings of Combat", "The Arena Gamers", "The Helios Cannon", "Behemoth", "The Bell Tolls"]
+            }
         ];
 
         window.gameData = albumAdatok.map((album) => {
