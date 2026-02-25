@@ -25,7 +25,7 @@
         .list-item:active { transform: scale(0.98); }
         
         .album-card { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
-        .album-img-large { width: 100%; max-height: 280px; height: auto; object-fit: contain; border-bottom: 3px solid #e09f3e; background: rgba(0,0,0,0.8); display: block; }
+        .album-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; margin-right: 20px; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.2); }
         .album-info-box { padding: 20px; box-sizing: border-box; width: 100%; }
         .album-title-large { font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 15px; text-align: center; }
         
@@ -77,7 +77,7 @@
         .match-detail { margin: 8px 0; font-size: 14px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px;}
         .trade-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px;}
         
-        hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;}
+        .trade-badge { position: absolute; top: -8px; right: -8px; background: #dc3545; color: white; border-radius: 50%; padding: 4px 8px; font-size: 12px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); display: none; z-index: 5; }
     </style>
 </head>
 <body>
@@ -110,7 +110,7 @@
     <div id="profile-setup-screen" class="container" style="display: none;">
         <h2 style="color: #e09f3e;">Setup your profile</h2>
         <input type="text" id="player-name" placeholder="Player Name (any characters)">
-        <input type="number" id="server-number" placeholder="State/Server (exactly 4 digits, e.g., 2530)">
+        <input type="number" id="server-number" placeholder="State/Server (3 or 4 digits, e.g., 253)">
         <input type="text" id="alliance-name" placeholder="Alliance Tag (exactly 3 chars, e.g., ABC)">
         <div id="profile-error" style="color:#ff6b6b; margin-bottom:10px; font-weight:bold;"></div>
         <button id="save-profile-btn" class="btn btn-green">Save & Continue</button>
@@ -135,9 +135,10 @@
             </div>
         </div>
         
-        <div class="action-buttons">
-            <button id="btn-match-clan" class="btn btn-blue t-btn-clan" style="width: 48%; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);">🤝 Search in Clan</button>
-            <button id="btn-match-state" class="btn btn-dark t-btn-state" style="width: 48%;">🌍 Search in State</button>
+<div class="action-buttons">
+            <button id="btn-match-clan" class="btn btn-blue t-btn-clan" style="width: 48%; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4); position: relative;">🤝 Search in Alliance<span id="badge-clan" class="trade-badge">0</span></button>
+            <button id="btn-match-state" class="btn btn-dark t-btn-state" style="width: 48%; position: relative;">🌍 Search in State<span id="badge-state" class="trade-badge">0</span></button>
+            <button id="btn-match-global" class="btn btn-dark t-btn-global" style="width: 100%; position: relative; box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);">🌌 Search in All States<span id="badge-global" class="trade-badge">0</span></button>
         </div>
 
         <div id="search-bar">
@@ -182,14 +183,14 @@ const firebaseConfig = {
         window.currentAlbumGlobal = null;
         window.currentCardGlobal = null;
 
-        const i18n = {
-            en: { state: "State", alliance: "Alliance", btnClan: "🤝 Search in Clan", btnState: "🌍 Search in State", searchPh: "🔍 Search album or card...", btnSave: "💾 Save Changes", btnLogout: "Logout", backAlbum: "⬅ Back to Albums", backCard: "⬅ Back to Cards", markDone: "✔ Set missing to 1", cardsOwnedInfo: "Completed Cards", givesYou: "They can give you:", asksFrom: "They ask from you:", traded: "Traded!", noMatch: "No matching players found." },
-            hu: { state: "Állam", alliance: "Szövetség", btnClan: "🤝 Keresés Klánban", btnState: "🌍 Keresés Államban", searchPh: "🔍 Keresés albumra vagy kártyára...", btnSave: "💾 Változások Mentése", btnLogout: "Kijelentkezés", backAlbum: "⬅ Vissza az Albumokhoz", backCard: "⬅ Vissza a Kártyákhoz", markDone: "✔ Hiányzók 1-re állítása", cardsOwnedInfo: "Ezek a kártyák megvannak", givesYou: "Tud adni neked:", asksFrom: "Kéri tőled:", traded: "Elcseréltük!", noMatch: "Nincs találat a cserepartnerekre." },
-            de: { state: "Staat", alliance: "Allianz", btnClan: "🤝 Suche im Clan", btnState: "🌍 Suche im Staat", searchPh: "🔍 Album suchen...", btnSave: "💾 Speichern", btnLogout: "Abmelden", backAlbum: "⬅ Zurück", backCard: "⬅ Zurück", markDone: "✔ Fehlende auf 1", cardsOwnedInfo: "Komplette Karten", givesYou: "Kann dir geben:", asksFrom: "Fragt von dir:", traded: "Gehandelt!", noMatch: "Keine passenden Spieler gefunden." },
-            fr: { state: "État", alliance: "Alliance", btnClan: "🤝 Chercher dans le Clan", btnState: "🌍 Chercher dans l'État", searchPh: "🔍 Chercher...", btnSave: "💾 Sauvegarder", btnLogout: "Déconnexion", backAlbum: "⬅ Retour", backCard: "⬅ Retour", markDone: "✔ Marquer à 1", cardsOwnedInfo: "Cartes complètes", givesYou: "Peut vous donner:", asksFrom: "Vous demande:", traded: "Échangé!", noMatch: "Aucun joueur correspondant." },
-            tr: { state: "Eyalet", alliance: "İttifak", btnClan: "🤝 Klanda Ara", btnState: "🌍 Eyalette Ara", searchPh: "🔍 Ara...", btnSave: "💾 Kaydet", btnLogout: "Çıkış Yap", backAlbum: "⬅ Albümlere Dön", backCard: "⬅ Kartlara Dön", markDone: "✔ Eksikleri 1 yap", cardsOwnedInfo: "Tamamlanan kartlar", givesYou: "Sana verebilir:", asksFrom: "Senden istiyor:", traded: "Takas edildi!", noMatch: "Eşleşen oyuncu bulunamadı." },
-            ru: { state: "Штат", alliance: "Альянс", btnClan: "🤝 Поиск в клане", btnState: "🌍 Поиск в штате", searchPh: "🔍 Поиск...", btnSave: "💾 Сохранить", btnLogout: "Выйти", backAlbum: "⬅ Назад", backCard: "⬅ Назад", markDone: "✔ На 1", cardsOwnedInfo: "Собранные карты", givesYou: "Может дать вам:", asksFrom: "Просит у вас:", traded: "Обменялись!", noMatch: "Игроков не найдено." },
-            ar: { state: "حالة", alliance: "تحالف", btnClan: "🤝 البحث في العشيرة", btnState: "🌍 البحث في الولاية", searchPh: "🔍 البحث...", btnSave: "💾 حفظ التغييرات", btnLogout: "تسجيل خروج", backAlbum: "⬅ العودة", backCard: "⬅ العودة", markDone: "✔ تعيين إلى 1", cardsOwnedInfo: "بطاقات مكتملة", givesYou: "يمكن أن يعطيك:", asksFrom: "يطلب منك:", traded: "تم التبادل!", noMatch: "لم يتم العثور على لاعبين." }
+const i18n = {
+            en: { state: "State", alliance: "Alliance", btnClan: "🤝 Search in Alliance", btnState: "🌍 Search in State", btnGlobal: "🌌 Search in All States", searchPh: "🔍 Search album or card...", btnSave: "💾 Save Changes", btnLogout: "Logout", backAlbum: "⬅ Back to Albums", backCard: "⬅ Back to Cards", markDone: "✔ Set missing to 1", cardsOwnedInfo: "Completed Cards", givesYou: "They can give you:", asksFrom: "They ask from you:", traded: "Traded!", noMatch: "No matching players found. (Note: Trades only appear if you have 2+ of a piece, and they have 0!)" },
+            hu: { state: "Állam", alliance: "Szövetség", btnClan: "🤝 Keresés Szövetségben", btnState: "🌍 Keresés Államban", btnGlobal: "🌌 Keresés Minden Államban", searchPh: "🔍 Keresés albumra vagy kártyára...", btnSave: "💾 Változások Mentése", btnLogout: "Kijelentkezés", backAlbum: "⬅ Vissza az Albumokhoz", backCard: "⬅ Vissza a Kártyákhoz", markDone: "✔ Hiányzók 1-re állítása", cardsOwnedInfo: "Ezek a kártyák megvannak", givesYou: "Tud adni neked:", asksFrom: "Kéri tőled:", traded: "Elcseréltük!", noMatch: "Nincs találat a cserepartnerekre. (Tipp: Cseréhez legalább 2 db kell valamiből!)" },
+            de: { state: "Staat", alliance: "Allianz", btnClan: "🤝 Suche in Allianz", btnState: "🌍 Suche im Staat", btnGlobal: "🌌 Suche in Allen Staaten", searchPh: "🔍 Album suchen...", btnSave: "💾 Speichern", btnLogout: "Abmelden", backAlbum: "⬅ Zurück", backCard: "⬅ Zurück", markDone: "✔ Fehlende auf 1", cardsOwnedInfo: "Komplette Karten", givesYou: "Kann dir geben:", asksFrom: "Fragt von dir:", traded: "Gehandelt!", noMatch: "Keine passenden Spieler gefunden." },
+            fr: { state: "État", alliance: "Alliance", btnClan: "🤝 Chercher dans l'Alliance", btnState: "🌍 Chercher dans l'État", btnGlobal: "🌌 Chercher dans Tous les États", searchPh: "🔍 Chercher...", btnSave: "💾 Sauvegarder", btnLogout: "Déconnexion", backAlbum: "⬅ Retour", backCard: "⬅ Retour", markDone: "✔ Marquer à 1", cardsOwnedInfo: "Cartes complètes", givesYou: "Peut vous donner:", asksFrom: "Vous demande:", traded: "Échangé!", noMatch: "Aucun joueur correspondant." },
+            tr: { state: "Eyalet", alliance: "İttifak", btnClan: "🤝 İttifakta Ara", btnState: "🌍 Eyalette Ara", btnGlobal: "🌌 Tüm Eyaletlerde Ara", searchPh: "🔍 Ara...", btnSave: "💾 Kaydet", btnLogout: "Çıkış Yap", backAlbum: "⬅ Albümlere Dön", backCard: "⬅ Kartlara Dön", markDone: "✔ Eksikleri 1 yap", cardsOwnedInfo: "Tamamlanan kartlar", givesYou: "Sana verebilir:", asksFrom: "Senden istiyor:", traded: "Takas edildi!", noMatch: "Eşleşen oyuncu bulunamadı." },
+            ru: { state: "Штат", alliance: "Альянс", btnClan: "🤝 Поиск в альянсе", btnState: "🌍 Поиск в штате", btnGlobal: "🌌 Поиск во всех штатах", searchPh: "🔍 Поиск...", btnSave: "💾 Сохранить", btnLogout: "Выйти", backAlbum: "⬅ Назад", backCard: "⬅ Назад", markDone: "✔ На 1", cardsOwnedInfo: "Собранные карты", givesYou: "Может дать вам:", asksFrom: "Просит у вас:", traded: "Обменялись!", noMatch: "Игроков не найдено." },
+            ar: { state: "حالة", alliance: "تحالف", btnClan: "🤝 البحث في التحالف", btnState: "🌍 البحث في الولاية", btnGlobal: "🌌 البحث في كل الولايات", searchPh: "🔍 البحث...", btnSave: "💾 حفظ التغييرات", btnLogout: "تسجيل خروج", backAlbum: "⬅ العودة", backCard: "⬅ العودة", markDone: "✔ تعيين إلى 1", cardsOwnedInfo: "بطاقات مكتملة", givesYou: "يمكن أن يعطيك:", asksFrom: "يطلب منك:", traded: "تم التبادل!", noMatch: "لم يتم العثور على لاعبين." }
         };
         window.currLang = 'en';
 
@@ -266,6 +267,7 @@ const firebaseConfig = {
             document.querySelector('.t-alliance').textContent = i18n[lang].alliance;
             document.querySelector('.t-btn-clan').textContent = i18n[lang].btnClan;
             document.querySelector('.t-btn-state').textContent = i18n[lang].btnState;
+if (document.querySelector('.t-btn-global')) document.querySelector('.t-btn-global').textContent = i18n[lang].btnGlobal;
             document.querySelector('.t-search-ph').placeholder = i18n[lang].searchPh;
             document.querySelector('.t-btn-save').textContent = i18n[lang].btnSave;
             document.querySelector('.t-btn-logout').textContent = i18n[lang].btnLogout;
@@ -277,6 +279,7 @@ const firebaseConfig = {
 
         document.getElementById('btn-match-clan').addEventListener('click', () => runMatchmaker('alliance'));
         document.getElementById('btn-match-state').addEventListener('click', () => runMatchmaker('state'));
+document.getElementById('btn-match-global').addEventListener('click', () => runMatchmaker('global'));
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
         document.getElementById('search-input').addEventListener('input', (e) => {
@@ -348,7 +351,7 @@ const firebaseConfig = {
             }
             sendPasswordResetEmail(auth, email).then(() => {
                 errorDiv.style.color = "#28a745"; // Zöld szín a sikernek
-                errorDiv.textContent = "Password reset email sent! Check your inbox and your SPAM folder too.";
+                errorDiv.textContent = "Password reset email sent! Check your inbox.";
             }).catch((error) => {
                 errorDiv.style.color = "#ff6b6b";
                 errorDiv.textContent = "Error: " + error.message;
@@ -377,7 +380,7 @@ const firebaseConfig = {
             const pServer = document.getElementById('server-number').value.trim();
             const pAlliance = document.getElementById('alliance-name').value.trim().toUpperCase();
             if(!pName || !pServer || !pAlliance) return document.getElementById('profile-error').textContent = "Please fill all fields!";
-            if(pServer.length !== 4 || isNaN(pServer)) return document.getElementById('profile-error').textContent = "State must be 4 digits.";
+            if((pServer.length !== 3 && pServer.length !== 4) || isNaN(pServer)) return document.getElementById('profile-error').textContent = "State must be 3 or 4 digits.";
             if(pAlliance.length !== 3) return document.getElementById('profile-error').textContent = "Alliance must be 3 characters.";
             await setDoc(doc(db, "jatekosok", window.currentUserUid), { jatekNev: pName, szerver: pServer, szovetseg: pAlliance, inventory: {} });
             checkUserProfile(window.currentUserUid);
@@ -393,6 +396,7 @@ const firebaseConfig = {
                 window.userInventory = data.inventory || {}; 
                 renderAlbums(); 
                 showScreen(mainScreen);
+updateTradeBadges();
             } else { showScreen(profileScreen); }
         }
 
@@ -435,7 +439,7 @@ const firebaseConfig = {
                 btn.onclick = () => renderCards(album);
                 
                 btn.innerHTML = `
-                    <img src="${album.image}" class="album-img-large" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23555%22/%3E%3Ctext x=%2250%22 y=%2255%22 font-family=%22Arial%22 font-size=%2230%22 fill=%22%23fff%22 text-anchor=%22middle%22%3E?%3C/text%3E%3C/svg%3E'">
+                    <img src="${album.image}" class="album-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23555%22/%3E%3Ctext x=%2250%22 y=%2255%22 font-family=%22Arial%22 font-size=%2230%22 fill=%22%23fff%22 text-anchor=%22middle%22%3E?%3C/text%3E%3C/svg%3E'">
                     <div class="album-info-box">
                         <div class="album-title-large">${aName}</div>
                         <div class="progress-bg">
@@ -645,6 +649,7 @@ const firebaseConfig = {
                 toast.textContent = "✅ Saved!";
                 toast.classList.add("show");
                 setTimeout(() => toast.classList.remove("show"), 2000);
+                updateTradeBadges();
             } catch (error) { console.error(error); }
         });
 
@@ -663,9 +668,10 @@ const firebaseConfig = {
                 const myServer = document.getElementById('display-server').textContent;
                 const myAlliance = document.getElementById('display-alliance').textContent;
 
-                let q = (scope === 'alliance') 
-                    ? query(collection(db, "jatekosok"), where("szerver", "==", myServer), where("szovetseg", "==", myAlliance))
-                    : query(collection(db, "jatekosok"), where("szerver", "==", myServer));
+                let q;
+                if (scope === 'alliance') q = query(collection(db, "jatekosok"), where("szerver", "==", myServer), where("szovetseg", "==", myAlliance));
+                else if (scope === 'state') q = query(collection(db, "jatekosok"), where("szerver", "==", myServer));
+                else q = query(collection(db, "jatekosok"));
                 
                 const querySnapshot = await getDocs(q);
 
@@ -712,7 +718,7 @@ const firebaseConfig = {
 
                 viewMatchmaker.innerHTML = '';
                 viewMatchmaker.appendChild(backBtn);
-                viewMatchmaker.insertAdjacentHTML('beforeend', `<h3>🤝 ${scope === 'alliance' ? myAlliance : myServer}</h3>`);
+                viewMatchmaker.insertAdjacentHTML('beforeend', `<h3>${scope === 'alliance' ? '🤝 ' + myAlliance : (scope === 'state' ? '🌍 ' + myServer : '🌌 All States')}</h3>`);
 
                 if (hasMatches) {
                     viewMatchmaker.insertAdjacentHTML('beforeend', resultsHtml);
@@ -744,8 +750,61 @@ const firebaseConfig = {
                 btnElement.style.backgroundColor = "#555";
             } catch(error) { alert("Trade error!"); btnElement.disabled = false; btnElement.textContent = i18n[window.currLang].traded; }
         }
+async function updateTradeBadges() {
+            try {
+                const myServer = document.getElementById('display-server').textContent;
+                const myAlliance = document.getElementById('display-alliance').textContent;
+                
+                const qGlobal = query(collection(db, "jatekosok"));
+                const globalSnapshot = await getDocs(qGlobal);
+
+                let clanTrades = 0, stateTrades = 0, globalTrades = 0;
+
+                globalSnapshot.forEach((userDoc) => {
+                    if (userDoc.id === window.currentUserUid) return;
+                    const otherData = userDoc.data();
+                    const otherInv = otherData.inventory || {};
+                    let hasTrade = false;
+
+                    for (let aIdx = 0; aIdx < window.gameData.length; aIdx++) {
+                        if(hasTrade) break;
+                        const album = window.gameData[aIdx];
+                        for (let cIdx = 0; cIdx < album.cards.length; cIdx++) {
+                            if(hasTrade) break;
+                            const card = album.cards[cIdx];
+                            for(let p = 1; p <= card.pieceCount; p++) {
+                                const pieceId = `${card.id}_piece_${p}`;
+                                const myQty = window.userInventory[pieceId] || 0;
+                                const otherQty = otherInv[pieceId] || 0;
+
+                                if ((myQty === 0 && otherQty >= 2) || (myQty >= 2 && otherQty === 0)) {
+                                    hasTrade = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (hasTrade) {
+                        globalTrades++;
+                        if (otherData.szerver === myServer) {
+                            stateTrades++;
+                            if (otherData.szovetseg === myAlliance) {
+                                clanTrades++;
+                            }
+                        }
+                    }
+                });
+
+                const bClan = document.getElementById('badge-clan');
+                const bState = document.getElementById('badge-state');
+                const bGlobal = document.getElementById('badge-global');
+
+                if(clanTrades > 0) { bClan.textContent = clanTrades; bClan.style.display = 'block'; } else { bClan.style.display = 'none'; }
+                if(stateTrades > 0) { bState.textContent = stateTrades; bState.style.display = 'block'; } else { bState.style.display = 'none'; }
+                if(globalTrades > 0) { bGlobal.textContent = globalTrades; bGlobal.style.display = 'block'; } else { bGlobal.style.display = 'none'; }
+            } catch (e) { console.error("Badge update error", e); }
+        }
     </script>
 </body>
-
 </html>
-
