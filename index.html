@@ -70,6 +70,23 @@
         .trade-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px;}
         
         hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;}
+/* --- ÚJ KÁRTYA RÁCS (GRID) DIZÁJN --- */
+        .card-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .grid-card-item { background: rgba(0,0,0,0.5); border: 2px solid rgba(224, 159, 62, 0.3); border-radius: 8px; padding: 10px; cursor: pointer; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s; min-height: 140px; }
+        .grid-card-item:hover { border-color: #e09f3e; background: rgba(0,0,0,0.7); transform: translateY(-3px); }
+        .grid-card-img-placeholder { width: 100%; height: 70px; background: rgba(255,255,255,0.05); border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: rgba(255,255,255,0.2); }
+        .grid-card-title { font-size: 13px; font-weight: bold; color: #fff; line-height: 1.2; flex-grow: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        
+        .card-prog-wrap { width: 100%; height: 16px; background: rgba(0,0,0,0.8); border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); position: relative; overflow: hidden; }
+        .card-prog-fill { height: 100%; background: #e09f3e; width: 0%; transition: width 0.3s; }
+        .card-prog-txt { position: absolute; top: 0; left: 0; width: 100%; text-align: center; font-size: 11px; line-height: 16px; color: #fff; font-weight: bold; text-shadow: 1px 1px 1px #000; }
+        .card-complete-txt { color: #4CAF50; font-weight: bold; font-size: 14px; margin-top: auto; }
+        
+        /* A kis "gyorskitöltő" pipa gomb a sarokban */
+        .grid-fast-fill { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; transition: all 0.2s; z-index: 5; }
+        .grid-fast-fill.checked { background: #28a745; border-color: #28a745; color: white; }
+        .grid-fast-fill.unchecked { color: transparent; }
+        .grid-fast-fill.unchecked:hover { color: white; border-color: white; }
     </style>
 </head>
 <body>
@@ -183,7 +200,9 @@ const firebaseConfig = {
         const albumAdatok = [
             { id: "album_0", kepFajlNev: "Rekindled_Flames.jpg", en: "Rekindled Flames", de: "Wiederentfachte Flammen", hu: "Újraéledő Lángok", fr: "Flammes ravivées", tr: "Yeniden Alevlenen", ru: "Вновь зажженное", ar: "نيران مشتعلة" },
             { id: "album_1", kepFajlNev: "Explore_the_World.jpg", en: "Explore the World", de: "Erkunde die Welt", hu: "Fedezd fel a Világot", fr: "Explorer le monde", tr: "Dünyayı Keşfet", ru: "Исследуй мир", ar: "استكشف العالم" },
-            { id: "album_2", kepFajlNev: "Daybreak_Island.jpg", en: "Daybreak Island", de: "Insel des Tagesanbruchs", hu: "Hajnal Sziget", fr: "Île de l'Aube", tr: "Şafak Adası", ru: "Остров Рассвета", ar: "جزيرة الفجر" },
+            { id: "album_2", kepFajlNev: "Daybreak_Island.jpg", en: "Daybreak Island", de: "Insel des Tagesanbruchs", hu: "Hajnal Sziget", fr: "Île de l'Aube", tr: "Şafak Adası", ru: "Остров Рассвета", ar: "جزيرة الفجر",
+              kartyaNevek: ["Daybreak Island Legend", "Island of Dreams", "Tree of Life", "Call of the Sea", "Distant Resonance", "Caravan Visit", "New Home", "Daybreak Song", "Island Splendors"] 
+            },
             { id: "album_3", kepFajlNev: "Tundra_Alliance.jpg", en: "Tundra Alliance", de: "Tundra-Allianz", hu: "Tundra Szövetség", fr: "Alliance de la Toundra", tr: "Tundra İttifakı", ru: "Альянс Тундры", ar: "تحالف التندرا" },
             { id: "album_4", kepFajlNev: "Battlefield_Epic.jpg", en: "Battlefield Epic", de: "Schlachtfeld-Epos", hu: "Csatatéri Eposz", fr: "Épopée du champ de bataille", tr: "Savaş Alanı Destanı", ru: "Эпос поля боя", ar: "ملحمة ساحة المعركة" },
             { id: "album_5", kepFajlNev: "Spectacular_Adventures.jpg", en: "Spectacular Adventures", de: "Spektakuläre Abenteuer", hu: "Különleges Kalandok", fr: "Aventures spectaculaires", tr: "Muhteşem Maceralar", ru: "Захватывающие приключения", ar: "مغامرات مذهلة" },
@@ -199,19 +218,19 @@ const firebaseConfig = {
             { id: "album_15", kepFajlNev: "Kings_of_Combat.jpg", en: "Kings of Combat", de: "Könige des Kampfes", hu: "A Harc Királyai", fr: "Rois du Combat", tr: "Savaş Kralları", ru: "Короли Битвы", ar: "ملوك القتال" }
         ];
 
-        window.gameData = albumAdatok.map((album) => {
+window.gameData = albumAdatok.map((album) => {
             return {
                 id: album.id,
                 image: `images/${album.kepFajlNev}`, 
                 names: { en: album.en, hu: album.hu, de: album.de, fr: album.fr, tr: album.tr, ru: album.ru, ar: album.ar },
                 cards: Array.from({length: 9}, (_, cIdx) => ({ 
                     id: `${album.id}_card_${cIdx+1}`, 
-                    name: `Card ${cIdx+1}`,
+                    // Itt a trükk: Ha van megadott név, használja azt, különben marad a Card 1, 2...
+                    name: album.kartyaNevek ? album.kartyaNevek[cIdx] : `Card ${cIdx+1}`,
                     pieceCount: 15
                 }))
             };
         });
-
         // --- GOMBOK ÉS ESEMÉNYEK ---
         document.getElementById('lang-selector').addEventListener('change', (e) => {
             window.currLang = e.target.value;
@@ -369,7 +388,7 @@ const firebaseConfig = {
             viewAlbums.style.display = 'block';
         }
 
-        function renderCards(album) {
+function renderCards(album) {
             hideAllViews();
             window.currentAlbumGlobal = album;
             const viewCards = document.getElementById('view-cards');
@@ -387,26 +406,30 @@ const firebaseConfig = {
                 <p style="text-align:right; font-size:12px; color:#aaa; margin-bottom:5px;">${i18n[window.currLang].cardsOwnedInfo} ⬇</p>
             `);
             
+            // Létrehozzuk a Grid (Rács) konténert
+            const gridContainer = document.createElement('div');
+            gridContainer.className = 'card-grid-container';
+
             album.cards.forEach(card => {
-                let isComplete = true;
+                // Kiszámoljuk, hány darab van meg pontosan a kártyából
+                let collectedPieces = 0;
                 for(let p = 1; p <= card.pieceCount; p++) {
                     const pid = `${card.id}_piece_${p}`;
-                    if(!window.userInventory[pid] || window.userInventory[pid] === 0) { isComplete = false; break; }
+                    if(window.userInventory[pid] && window.userInventory[pid] > 0) {
+                        collectedPieces++;
+                    }
                 }
+                const isComplete = collectedPieces === card.pieceCount;
+                const progressPct = Math.round((collectedPieces / card.pieceCount) * 100);
 
-                const row = document.createElement('div');
-                row.className = 'list-item card-item';
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'grid-card-item';
+                cardDiv.onclick = () => renderPuzzle(album, card);
                 
-                const nameSpan = document.createElement('span');
-                nameSpan.style.flexGrow = "1";
-                nameSpan.style.textAlign = "left";
-                nameSpan.textContent = card.name;
-                nameSpan.onclick = () => renderPuzzle(album, card);
-                
+                // Gyorskitöltő pipa a sarokban
                 const fastFillBtn = document.createElement('div');
-                fastFillBtn.className = `check-btn ${isComplete ? 'checked' : 'unchecked'}`;
+                fastFillBtn.className = `grid-fast-fill ${isComplete ? 'checked' : 'unchecked'}`;
                 fastFillBtn.innerHTML = '✔';
-                
                 fastFillBtn.onclick = (e) => {
                     e.stopPropagation(); 
                     if(isComplete) {
@@ -423,10 +446,30 @@ const firebaseConfig = {
                     renderCards(album); 
                 };
                 
-                row.appendChild(nameSpan);
-                row.appendChild(fastFillBtn);
-                viewCards.appendChild(row);
+                // A kártya tartalmának összeállítása (Kép helye, Név, és Folyamat / Complete)
+                let statusHtml = '';
+                if (isComplete) {
+                    statusHtml = `<div class="card-complete-txt">Complete</div>`;
+                } else {
+                    statusHtml = `
+                        <div class="card-prog-wrap">
+                            <div class="card-prog-fill" style="width: ${progressPct}%"></div>
+                            <div class="card-prog-txt">${collectedPieces}/${card.pieceCount}</div>
+                        </div>
+                    `;
+                }
+
+                cardDiv.innerHTML = `
+                    <div class="grid-card-img-placeholder">🖼️</div>
+                    <div class="grid-card-title">${card.name}</div>
+                    ${statusHtml}
+                `;
+                
+                cardDiv.appendChild(fastFillBtn);
+                gridContainer.appendChild(cardDiv);
             });
+            
+            viewCards.appendChild(gridContainer);
             viewCards.style.display = 'block';
         }
 
