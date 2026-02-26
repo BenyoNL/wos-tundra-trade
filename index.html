@@ -862,13 +862,23 @@ function updateQty(pieceId, change) {
                         });
                     });
 
-                    if (giveToMe.length > 0 || takeFromMe.length > 0) {
+                                        let totalTrades = giveToMe.length + takeFromMe.length;
+                    if (totalTrades > 0) {
                         hasMatches = true;
-                        resultsHtml += `<div class="match-card"><h4>👤 ${otherName}</h4>`;
+                        // Az <details> és <summary> adja a lenyíló menüt!
+                        resultsHtml += `
+                        <details class="match-card" style="cursor:pointer;">
+                            <summary style="outline: none; font-size: 18px; font-weight: bold; color: #e09f3e; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                👤 ${otherName} <span style="color:#fff; font-size:14px; font-weight:normal; float:right;">(${totalTrades} 🔄)</span>
+                            </summary>
+                            <div style="cursor:default; margin-top: 10px;">`;
+                            
                         if (giveToMe.length > 0) resultsHtml += `<div class="match-detail" style="border-left: 3px solid #28a745;"><b style="color:#28a745;">${i18n[window.currLang].givesYou}</b><br>${giveToMe.join('')}</div>`;
                         if (takeFromMe.length > 0) resultsHtml += `<div class="match-detail" style="border-left: 3px solid #4285F4;"><b style="color:#4285F4;">${i18n[window.currLang].asksFrom}</b><br>${takeFromMe.join('')}</div>`;
-                        resultsHtml += `</div>`;
+                        
+                        resultsHtml += `</div></details>`;
                     }
+
                 });
 
                 viewMatchmaker.innerHTML = '';
