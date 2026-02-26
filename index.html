@@ -838,7 +838,7 @@ function updateQty(pieceId, change) {
 
                     const otherData = userDoc.data();
                     const otherInv = otherData.inventory || {};
-                    const otherName = `[${otherData.szovetseg}]${otherData.jatekNev || otherData.nev}`; 
+                    const otherName = `[#${otherData.szerver}] [${otherData.szovetseg}] ${otherData.jatekNev || otherData.nev}`;
 
                     let giveToMe = []; 
                     let takeFromMe = []; 
