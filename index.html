@@ -34,7 +34,7 @@
         .grid-card-item { background: rgba(0,0,0,0.5); border: 2px solid rgba(224, 159, 62, 0.3); border-radius: 8px; padding: 10px; cursor: pointer; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s; min-height: 140px; }
         .grid-card-item:hover { border-color: #e09f3e; background: rgba(0,0,0,0.7); transform: translateY(-3px); }
         .grid-card-img-placeholder { width: 100%; height: 70px; background: rgba(255,255,255,0.05); border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: rgba(255,255,255,0.2); }
-        .grid-card-img { width: 100%; height: auto; max-height: 120px; object-fit: contain; border-radius: 6px; margin-bottom: 8px; background: transparent; padding: 0; }
+        .grid-card-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: center top; border-radius: 6px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .grid-card-title { font-size: 13px; font-weight: bold; color: #fff; line-height: 1.2; flex-grow: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; text-align: center;}
         
         .card-prog-wrap { width: 100%; height: 16px; background: rgba(0,0,0,0.8); border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); position: relative; overflow: hidden; }
@@ -867,3 +867,4 @@ darabszamok: [12, 15, 15, 15, 15, 18, 18, 18, 18]
 </body>
 
 </html>
+
