@@ -106,6 +106,28 @@
         .puzzle-nav-next { right: 10px; }
         /* Ha nagy képernyőn (PC) vagy, a nyilak a doboz széléhez igazodnak, nem a monitor széléhez: */
         @media (min-width: 850px) { .puzzle-nav-prev { left: calc(50% - 430px); } .puzzle-nav-next { right: calc(50% - 430px); } }
+        /* MOBILOS OPTIMALIZÁLÁS (Reszponzív nézet) */
+        @media (max-width: 600px) {
+            /* 1. Az albumok képei ne legyenek olyan hatalmasak mobilon */
+            .album-img-large { height: 160px; }
+            
+            /* 2. A kártyák 3 helyett csak 2 oszlopban jelenjenek meg, hogy ne nyomorodjanak össze */
+            .card-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            
+            /* 3. A kártyák képei tökéletes négyzetek maradjanak */
+            .grid-card-item { min-height: 120px; padding: 8px; }
+            .grid-card-img { height: auto; aspect-ratio: 1 / 1; margin-bottom: 5px; }
+            .grid-card-title { font-size: 11px; }
+            
+            /* 4. A puzzle darabok bogyói (számok) picit kisebbek legyenek, hogy ne lógjanak le a képről */
+            .qty-badge { font-size: 12px; padding: 1px 6px; bottom: 3px; right: 3px; }
+            
+            /* 5. A lapozó nyilak méretének finomítása */
+            .puzzle-nav-btn { width: 35px; height: 35px; font-size: 18px; }
+            .puzzle-nav-prev { left: 2px; }
+            .puzzle-nav-next { right: 2px; }
+        }
+
     </style>
 </head>
 <body>
