@@ -207,14 +207,14 @@ const firebaseConfig = {
         window.currentAlbumGlobal = null;
         window.currentCardGlobal = null;
 
-        const i18n = {
-            en: { state: "State", alliance: "Alliance", btnClan: "🤝 Search in Alliance", btnState: "🌍 Search in State", btnGlobal: "🌌 Search in All States", searchPh: "🔍 Search album or card...", btnSave: "💾 Save Changes", btnLogout: "Logout", backAlbum: "⬅ Back to Albums", backCard: "⬅ Back to Cards", markDone: "✔ Set missing to 1", cardsOwnedInfo: "Completed Cards", givesYou: "They can give you:", asksFrom: "They ask from you:", traded: "Traded!", noMatch: "No matching players found. (Note: Trades only appear if you have 2+ of a piece, and they have 0!)", tradeWarning: "⚠️ Only click 'Traded!' if the exchange actually happened in the game!" },
-            de: { state: "Staat", alliance: "Allianz", btnClan: "🤝 Suche in Allianz", btnState: "🌍 Suche im Staat", btnGlobal: "🌌 Suche in Allen Staaten", searchPh: "🔍 Album suchen...", btnSave: "💾 Speichern", btnLogout: "Abmelden", backAlbum: "⬅ Zurück", backCard: "⬅ Zurück", markDone: "✔ Fehlende auf 1", cardsOwnedInfo: "Komplette Karten", givesYou: "Kann dir geben:", asksFrom: "Fragt von dir:", traded: "Gehandelt!", noMatch: "Keine passenden Spieler gefunden.", tradeWarning: "⚠️ Klicke nur auf 'Traded!', wenn der Tausch im Spiel stattfand!" },
-            fr: { state: "État", alliance: "Alliance", btnClan: "🤝 Chercher dans l'Alliance", btnState: "🌍 Chercher dans l'État", btnGlobal: "🌌 Chercher dans Tous les États", searchPh: "🔍 Chercher...", btnSave: "💾 Sauvegarder", btnLogout: "Déconnexion", backAlbum: "⬅ Retour", backCard: "⬅ Retour", markDone: "✔ Marquer à 1", cardsOwnedInfo: "Cartes complètes", givesYou: "Peut vous donner:", asksFrom: "Vous demande:", traded: "Échangé!", noMatch: "Aucun joueur correspondant.", tradeWarning: "⚠️ Ne cliquez sur 'Échangé' que si l'échange a eu lieu dans le jeu !" },
-            tr: { state: "Eyalet", alliance: "İttifak", btnClan: "🤝 İttifakta Ara", btnState: "🌍 Eyalette Ara", btnGlobal: "🌌 Tüm Eyaletlerde Ara", searchPh: "🔍 Ara...", btnSave: "💾 Kaydet", btnLogout: "Çıkış Yap", backAlbum: "⬅ Albümlere Dön", backCard: "⬅ Kartlara Dön", markDone: "✔ Eksikleri 1 yap", cardsOwnedInfo: "Tamamlanan kartlar", givesYou: "Sana verebilir:", asksFrom: "Senden istiyor:", traded: "Takas edildi!", noMatch: "Eşleşen oyuncu bulunamadı.", tradeWarning: "⚠️ Yalnızca oyun içinde takas gerçekleştiyse 'Takas edildi!' butonuna tıklayın!" },
-            hu: { state: "Állam", alliance: "Szövetség", btnClan: "🤝 Keresés Szövetségben", btnState: "🌍 Keresés Államban", btnGlobal: "🌌 Keresés Minden Államban", searchPh: "🔍 Keresés albumra vagy kártyára...", btnSave: "💾 Változások Mentése", btnLogout: "Kijelentkezés", backAlbum: "⬅ Vissza az Albumokhoz", backCard: "⬅ Vissza a Kártyákhoz", markDone: "✔ Hiányzók 1-re állítása", cardsOwnedInfo: "Ezek a kártyák megvannak", givesYou: "Tud adni neked:", asksFrom: "Kéri tőled:", traded: "Elcseréltük!", noMatch: "Nincs találat a cserepartnerekre. (Tipp: Cseréhez legalább 2 db kell valamiből!)", tradeWarning: "⚠️ Csak akkor kattints a 'Traded!' gombra, ha a játékban is megtörtént a csere!" },            
-ru: { state: "Штат", alliance: "Альянс", btnClan: "🤝 Поиск в альянсе", btnState: "🌍 Поиск в штате", btnGlobal: "🌌 Поиск во всех штатах", searchPh: "🔍 Поиск...", btnSave: "💾 Сохранить", btnLogout: "Выйти", backAlbum: "⬅ Назад", backCard: "⬅ Назад", markDone: "✔ На 1", cardsOwnedInfo: "Собранные карты", givesYou: "Может дать вам:", asksFrom: "Просит у вас:", traded: "Обменялись!", noMatch: "Игроков не найдено.", tradeWarning: "⚠️ Нажимайте 'Обменялись!' только если обмен уже произошел в игре!" },
-            ar: { state: "حالة", alliance: "تحالف", btnClan: "🤝 البحث في التحالف", btnState: "🌍 البحث في الولاية", btnGlobal: "🌌 البحث في كل الولايات", searchPh: "🔍 البحث...", btnSave: "💾 حفظ التغييرات", btnLogout: "تسجيل خروج", backAlbum: "⬅ العودة", backCard: "⬅ العودة", markDone: "✔ تعيين إلى 1", cardsOwnedInfo: "بطاقات مكتملة", givesYou: "يمكن أن يعطيك:", asksFrom: "يطلب منك:", traded: "تم التبادل!", noMatch: "لم يتم العثور على لاعبين.", tradeWarning: "⚠️ انقر فقط على 'تم التبادل!' إذا حدث التبادل بالفعل في اللعبة!" }
+const i18n = {
+            en: { state: "State", alliance: "Alliance", btnClan: "🤝 Search in Alliance", btnState: "🌍 Search in State", btnGlobal: "🌌 Search in All States", searchPh: "🔍 Search album or card...", btnSave: "💾 Save Changes", btnLogout: "Logout", backAlbum: "⬅ Back to Albums", backCard: "⬅ Back to Cards", markDone: "✔ Set missing to 1", cardsOwnedInfo: "Completed Cards", givesYou: "They can give you:", asksFrom: "They ask from you:", traded: "Traded!", noMatch: "No matching players found.", tradeWarning: "⚠️ Only click 'Traded!' if the exchange actually happened in the game!", videoSearch: "⏳ Searching...", videoPending: "Video upload in progress..." },
+            de: { state: "Staat", alliance: "Allianz", btnClan: "🤝 Suche in Allianz", btnState: "🌍 Suche im Staat", btnGlobal: "🌌 Suche in Allen Staaten", searchPh: "🔍 Album suchen...", btnSave: "💾 Speichern", btnLogout: "Abmelden", backAlbum: "⬅ Zurück", backCard: "⬅ Zurück", markDone: "✔ Fehlende auf 1", cardsOwnedInfo: "Komplette Karten", givesYou: "Kann dir geben:", asksFrom: "Fragt von dir:", traded: "Gehandelt!", noMatch: "Keine passenden Spieler gefunden.", tradeWarning: "⚠️ Klicke nur auf 'Traded!', wenn der Tausch im Spiel stattfand!", videoSearch: "⏳ Suchen...", videoPending: "Video-Upload läuft..." },
+            fr: { state: "État", alliance: "Alliance", btnClan: "🤝 Chercher dans l'Alliance", btnState: "🌍 Chercher dans l'État", btnGlobal: "🌌 Chercher dans Tous les États", searchPh: "🔍 Chercher...", btnSave: "💾 Sauvegarder", btnLogout: "Déconnexion", backAlbum: "⬅ Retour", backCard: "⬅ Retour", markDone: "✔ Marquer à 1", cardsOwnedInfo: "Cartes complètes", givesYou: "Peut vous donner:", asksFrom: "Vous demande:", traded: "Échangé!", noMatch: "Aucun joueur correspondant.", tradeWarning: "⚠️ Ne cliquez sur 'Échangé' que si l'échange a eu lieu dans le jeu !", videoSearch: "⏳ Recherche...", videoPending: "Téléchargement de la vidéo en cours..." },
+            tr: { state: "Eyalet", alliance: "İttifak", btnClan: "🤝 İttifakta Ara", btnState: "🌍 Eyalette Ara", btnGlobal: "🌌 Tüm Eyaletlerde Ara", searchPh: "🔍 Ara...", btnSave: "💾 Kaydet", btnLogout: "Çıkış Yap", backAlbum: "⬅ Albümlere Dön", backCard: "⬅ Kartlara Dön", markDone: "✔ Eksikleri 1 yap", cardsOwnedInfo: "Tamamlanan kartlar", givesYou: "Sana verebilir:", asksFrom: "Senden istiyor:", traded: "Takas edildi!", noMatch: "Eşleşen oyuncu bulunamadı.", tradeWarning: "⚠️ Yalnızca oyun içinde takas gerçekleştiyse 'Takas edildi!' butonuna tıklayın!", videoSearch: "⏳ Aranıyor...", videoPending: "Video yüklemesi devam ediyor..." },
+            hu: { state: "Állam", alliance: "Szövetség", btnClan: "🤝 Keresés Szövetségben", btnState: "🌍 Keresés Államban", btnGlobal: "🌌 Keresés Minden Államban", searchPh: "🔍 Keresés albumra vagy kártyára...", btnSave: "💾 Változások Mentése", btnLogout: "Kijelentkezés", backAlbum: "⬅ Vissza az Albumokhoz", backCard: "⬅ Vissza a Kártyákhoz", markDone: "✔ Hiányzók 1-re állítása", cardsOwnedInfo: "Ezek a kártyák megvannak", givesYou: "Tud adni neked:", asksFrom: "Kéri tőled:", traded: "Elcseréltük!", noMatch: "Nincs találat a cserepartnerekre.", tradeWarning: "⚠️ Csak akkor kattints a 'Traded!' gombra, ha a játékban is megtörtént a csere!", videoSearch: "⏳ Keresés...", videoPending: "A videó feltöltése folyamatban..." },
+	    ru: { state: "Штат", alliance: "Альянс", btnClan: "🤝 Поиск в альянсе", btnState: "🌍 Поиск в штате", btnGlobal: "🌌 Поиск во всех штатах", searchPh: "🔍 Поиск...", btnSave: "💾 Сохранить", btnLogout: "Выйти", backAlbum: "⬅ Назад", backCard: "⬅ Назад", markDone: "✔ На 1", cardsOwnedInfo: "Собранные карты", givesYou: "Может дать вам:", asksFrom: "Просит у вас:", traded: "Обменялись!", noMatch: "Игроков не найдено.", tradeWarning: "⚠️ Нажимайте 'Обменялись!' только если обмен уже произошел в игре!", videoSearch: "⏳ Поиск...", videoPending: "Идет загрузка видео..." },
+            ar: { state: "حالة", alliance: "تحالف", btnClan: "🤝 البحث في التحالف", btnState: "🌍 البحث في الولاية", btnGlobal: "🌌 البحث في كل الولايات", searchPh: "🔍 البحث...", btnSave: "💾 حفظ التغييرات", btnLogout: "تسجيل خروج", backAlbum: "⬅ العودة", backCard: "⬅ العودة", markDone: "✔ تعيين إلى 1", cardsOwnedInfo: "بطاقات مكتملة", givesYou: "يمكن أن يعطيك:", asksFrom: "يطلب منك:", traded: "تم التبادل!", noMatch: "لم يتم العثور على لاعبين.", tradeWarning: "⚠️ انقر فقط على 'تم التبادل!' إذا حدث التبادل بالفعل في اللعبة!", videoSearch: "⏳ جاري البحث...", videoPending: "جاري تحميل الفيديو..." }
         };
         window.currLang = 'en';
 
@@ -306,17 +306,21 @@ darabszamok: [12, 15, 15, 15, 15, 18, 18, 18, 18]
         });
 
         // --- GOMBOK ÉS ESEMÉNYEK ---
-        document.getElementById('lang-selector').addEventListener('change', (e) => {
+document.getElementById('lang-selector').addEventListener('change', (e) => {
             window.currLang = e.target.value;
             const lang = window.currLang;
+            
             document.querySelector('.t-state').textContent = i18n[lang].state;
             document.querySelector('.t-alliance').textContent = i18n[lang].alliance;
             document.querySelector('.t-btn-clan').textContent = i18n[lang].btnClan;
             document.querySelector('.t-btn-state').textContent = i18n[lang].btnState;
             if (document.querySelector('.t-btn-global')) document.querySelector('.t-btn-global').textContent = i18n[lang].btnGlobal;
             document.querySelector('.t-search-ph').placeholder = i18n[lang].searchPh;
-            document.querySelector('.t-btn-save').textContent = i18n[lang].btnSave;
-            document.querySelector('.t-btn-logout').textContent = i18n[lang].btnLogout;
+            
+            // A Logout gomb fordítása (a hibát okozó Save gomb fordítását innen töröltük!)
+            if (document.querySelector('.t-btn-logout')) {
+                document.querySelector('.t-btn-logout').textContent = i18n[lang].btnLogout;
+            }
             
             if(document.getElementById('view-albums').style.display === 'block') renderAlbums();
             if(document.getElementById('view-cards').style.display === 'block') renderCards(window.currentAlbumGlobal);
@@ -565,30 +569,25 @@ let statusHtml = '';
                     const videoUrl = card.image.replace('.jpg', '.mp4');
                     const vidContainerId = `vid-status-${card.id}`;
                     
-                    // Alapból egy "töltés" vagy üres helyőrző jelenik meg
                     statusHtml = `
                         <div class="card-complete-txt">Complete</div>
-                        <div id="${vidContainerId}" style="margin-top: 5px; font-size: 10px; color: #ffc107; text-align: center; font-style: italic; line-height: 1.2;">⏳ Keresés...</div>
+                        <div id="${vidContainerId}" style="margin-top: 5px; font-size: 10px; color: #ffc107; text-align: center; font-style: italic; line-height: 1.2;">${i18n[window.currLang].videoSearch}</div>
                     `;
                     
-                    // A háttérben ellenőrizzük, hogy létezik-e az mp4 fájl a szerveren
                     fetch(videoUrl, { method: 'HEAD' })
                         .then(response => {
                             const container = document.getElementById(vidContainerId);
                             if (!container) return;
                             
                             if (response.ok) {
-                                // Ha a fájl létezik, betesszük a Play gombot!
                                 container.innerHTML = `<button class="btn btn-play btn-small" style="margin:0; width:100%;" onclick="event.stopPropagation(); playCardVideo('${videoUrl}')">▶️ Play Animation</button>`;
                             } else {
-                                // Ha a fájl nem létezik (404), kiírjuk a szöveget
-                                container.innerHTML = `A videó feltöltése folyamatban...`;
+                                container.innerHTML = i18n[window.currLang].videoPending;
                             }
                         })
                         .catch(() => {
-                            // Ha bármilyen más hálózati hiba van
                             const container = document.getElementById(vidContainerId);
-                            if (container) container.innerHTML = `A videó feltöltése folyamatban...`;
+                            if (container) container.innerHTML = i18n[window.currLang].videoPending;
                         });
                         
                 } else {
