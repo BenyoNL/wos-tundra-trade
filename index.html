@@ -154,7 +154,24 @@
             <h2 style="color: #fff; margin-top: 0; font-weight: normal; font-size: 22px;">❄️ Tundra Trade ❄️</h2>
             <p style="color: #aaa; font-style: italic;">The Ultimate Puzzle Exchange Tool</p>
         </div>
-<div id="register-screen" class="container" style="display: none;">
+        
+        <input type="email" id="email-input" placeholder="Email address">
+        <div style="position: relative; width: 90%; margin: 10px auto;">
+            <input type="password" id="password-input" placeholder="Password" style="width: 100%; margin: 0; padding-right: 40px;">
+            <span id="toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 20px;">👁️</span>
+        </div>
+        <div style="text-align: right; width: 90%; margin: -5px auto 15px auto;">
+            <a href="#" id="forgot-password-link" style="color: #e09f3e; font-size: 14px; text-decoration: none; font-weight: bold;">Forgot password?</a>
+        </div>
+        <div id="auth-error" style="color:#ff6b6b; margin-bottom:10px; font-weight:bold;"></div>
+        
+        <button id="email-login-btn" class="btn btn-green">Login with Email</button>
+        <button id="email-register-btn" class="btn btn-dark">Register new account</button>
+        <div style="margin: 20px 0; color: #888; display: flex; align-items: center; justify-content: center;">
+            <hr style="flex-grow: 1; margin: 0 15px;"><span style="font-size: 14px;">OR</span><hr style="flex-grow: 1; margin: 0 15px;">
+        </div>
+        <button id="google-login-btn" class="btn btn-blue">Login with Google</button>
+</div> <div id="register-screen" class="container" style="display: none;">
         <h2 style="color: #e09f3e;">Create New Account</h2>
         <input type="email" id="reg-email" placeholder="Email address">
         <input type="password" id="reg-password" placeholder="Password (min. 6 chars)">
@@ -165,23 +182,7 @@
         <div id="reg-error" style="color:#ff6b6b; margin-bottom:10px; font-weight:bold;"></div>
         <button id="do-register-btn" class="btn btn-green">Register & Play</button>
         <button id="back-to-login-btn" class="btn btn-back" style="width: 90%; margin-top: 10px;">⬅ Back to Login</button>
-    </div>
-        <input type="email" id="email-input" placeholder="Email address">
-        <div style="position: relative; width: 90%; margin: 10px auto;">
-            <input type="password" id="password-input" placeholder="Password" style="width: 100%; margin: 0; padding-right: 40px;">
-            <span id="toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 20px;">👁️</span>
-        </div>
-        <div style="text-align: right; width: 90%; margin: -5px auto 15px auto;">
-            <a href="#" id="forgot-password-link" style="color: #e09f3e; font-size: 14px; text-decoration: none; font-weight: bold;">Forgot password?</a>
-        </div>
-        <div id="auth-error" style="color:#ff6b6b; margin-bottom:10px; font-weight:bold;"></div>
-        <button id="email-login-btn" class="btn btn-green">Login with Email</button>
-        <button id="email-register-btn" class="btn btn-dark">Register new account</button>
-        <div style="margin: 20px 0; color: #888; display: flex; align-items: center; justify-content: center;">
-            <hr style="flex-grow: 1; margin: 0 15px;"><span style="font-size: 14px;">OR</span><hr style="flex-grow: 1; margin: 0 15px;">
-        </div>
-        <button id="google-login-btn" class="btn btn-blue">Login with Google</button>
-    </div>
+</div>
 
     <div id="profile-setup-screen" class="container" style="display: none;">
         <h2 style="color: #e09f3e;">Setup your profile</h2>
@@ -475,17 +476,25 @@ document.getElementById('lang-selector').addEventListener('change', (e) => {
             });
         });
 
-const authScreen = document.getElementById('auth-screen');
+// --- KÉPERNYŐK KEZELÉSE ---
+        const authScreen = document.getElementById('auth-screen');
         const profileScreen = document.getElementById('profile-setup-screen');
         const mainScreen = document.getElementById('main-app-screen');
-        const registerScreen = document.getElementById('register-screen'); // <-- ÚJ
+        const registerScreen = document.getElementById('register-screen');
 
         function showScreen(screen) {
-            authScreen.style.display = 'none';
-            profileScreen.style.display = 'none';
-            mainScreen.style.display = 'none';
+            // Mindent elrejtünk (csak akkor, ha létezik az elem)
+            if(authScreen) authScreen.style.display = 'none';
+            if(profileScreen) profileScreen.style.display = 'none';
+            if(mainScreen) mainScreen.style.display = 'none';
             if(registerScreen) registerScreen.style.display = 'none';
-            screen.style.display = 'block';
+            
+            // Megjelenítjük a kért képernyőt
+            if(screen) {
+                screen.style.display = 'block';
+            } else {
+                console.error("Hiba: A megjeleníteni kívánt képernyő nem található a HTML-ben!");
+            }
         }
 
 // Átlépés az új regisztrációs felületre
