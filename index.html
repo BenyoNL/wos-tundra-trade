@@ -497,50 +497,91 @@ document.getElementById('lang-selector').addEventListener('change', (e) => {
             }
         }
 
-// Átlépés az új regisztrációs felületre
-        document.getElementById('email-register-btn').addEventListener('click', () => {
-            showScreen(registerScreen);
-        });
+// ==========================================
+        // BELÉPÉS ÉS REGISZTRÁCIÓ GOMBOK KEZELÉSE
+        // ==========================================
 
-        // Visszalépés a bejelentkezéshez
-        document.getElementById('back-to-login-btn').addEventListener('click', () => {
-            showScreen(authScreen);
-        });
+        // 1. E-mail belépés gomb
+        const emailLoginBtn = document.getElementById('email-login-btn');
+        if (emailLoginBtn) {
+            emailLoginBtn.addEventListener('click', async () => {
+                const email = document.getElementById('email-input').value.trim();
+                const password = document.getElementById('password-input').value;
+                const errorDiv = document.getElementById('auth-error');
+                if (!email || !password) { errorDiv.textContent = "Please fill in both fields."; return; }
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    window.location.reload();
+                } catch (e) {
+                    errorDiv.textContent = e.message;
+                }
+            });
+        }
 
-        // A tényleges regisztráció lebonyolítása mindennel együtt
-        document.getElementById('do-register-btn').addEventListener('click', async () => {
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value;
-            const pName = document.getElementById('reg-player-name').value.trim();
-            const pServer = parseInt(document.getElementById('reg-server-number').value);
-            const pAlliance = document.getElementById('reg-alliance-name').value.trim().toUpperCase();
-            const errorDiv = document.getElementById('reg-error');
+        // 2. Google belépés gomb
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', async () => {
+                try {
+                    // Itt javítva a provider neve a te kódodhoz!
+                    await signInWithPopup(auth, provider);
+                    window.location.reload();
+                } catch (e) {
+                    document.getElementById('auth-error').textContent = e.message;
+                }
+            });
+        }
 
-            if (!email || !password || !pName || !pServer || pAlliance.length !== 3) {
-                errorDiv.textContent = "Please fill in all fields correctly (Alliance exactly 3 chars).";
-                return;
-            }
+        // 3. Átlépés az új regisztrációs felületre
+        const emailRegisterBtn = document.getElementById('email-register-btn');
+        if (emailRegisterBtn) {
+            emailRegisterBtn.addEventListener('click', () => {
+                showScreen(registerScreen);
+            });
+        }
 
-            try {
-                // 1. Fiók létrehozása
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
-                // 2. Profil azonnali mentése az adatbázisba
-                await setDoc(doc(db, "jatekosok", user.uid), {
-                    nev: email.split('@')[0], 
-                    jatekNev: pName,
-                    szerver: pServer,
-                    szovetseg: pAlliance,
-                    inventory: {}
-                });
-                
-                // 3. Frissítjük az oldalt, hogy automatikusan belépjen a főképernyőre
-                window.location.reload();
-            } catch (e) {
-                errorDiv.textContent = e.message;
-            }
-        });
+        // 4. Visszalépés a bejelentkezéshez
+        const backToLoginBtn = document.getElementById('back-to-login-btn');
+        if (backToLoginBtn) {
+            backToLoginBtn.addEventListener('click', () => {
+                showScreen(authScreen);
+            });
+        }
+
+        // 5. A tényleges regisztráció lebonyolítása mindennel együtt
+        const doRegisterBtn = document.getElementById('do-register-btn');
+        if (doRegisterBtn) {
+            doRegisterBtn.addEventListener('click', async () => {
+                const email = document.getElementById('reg-email').value.trim();
+                const password = document.getElementById('reg-password').value;
+                const pName = document.getElementById('reg-player-name').value.trim();
+                const pServer = parseInt(document.getElementById('reg-server-number').value);
+                const pAlliance = document.getElementById('reg-alliance-name').value.trim().toUpperCase();
+                const errorDiv = document.getElementById('reg-error');
+
+                if (!email || !password || !pName || !pServer || pAlliance.length !== 3) {
+                    errorDiv.textContent = "Please fill in all fields correctly (Alliance exactly 3 chars).";
+                    return;
+                }
+
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    await setDoc(doc(db, "jatekosok", user.uid), {
+                        nev: email.split('@')[0], 
+                        jatekNev: pName,
+                        szerver: pServer,
+                        szovetseg: pAlliance,
+                        inventory: {}
+                    });
+                    
+                    window.location.reload();
+                } catch (e) {
+                    errorDiv.textContent = e.message;
+                }
+            });
+        }
 
         async function checkUserProfile(uid) {
             const docSnap = await getDoc(doc(db, "jatekosok", uid));
