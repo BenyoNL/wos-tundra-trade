@@ -154,6 +154,18 @@
             <h2 style="color: #fff; margin-top: 0; font-weight: normal; font-size: 22px;">❄️ Tundra Trade ❄️</h2>
             <p style="color: #aaa; font-style: italic;">The Ultimate Puzzle Exchange Tool</p>
         </div>
+<div id="register-screen" class="container" style="display: none;">
+        <h2 style="color: #e09f3e;">Create New Account</h2>
+        <input type="email" id="reg-email" placeholder="Email address">
+        <input type="password" id="reg-password" placeholder="Password (min. 6 chars)">
+        <hr style="border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0;">
+        <input type="text" id="reg-player-name" placeholder="Player Name (any characters)">
+        <input type="number" id="reg-server-number" placeholder="State/Server (e.g., 253)">
+        <input type="text" id="reg-alliance-name" placeholder="Alliance Tag (exactly 3 chars, e.g., ABC)">
+        <div id="reg-error" style="color:#ff6b6b; margin-bottom:10px; font-weight:bold;"></div>
+        <button id="do-register-btn" class="btn btn-green">Register & Play</button>
+        <button id="back-to-login-btn" class="btn btn-back" style="width: 90%; margin-top: 10px;">⬅ Back to Login</button>
+    </div>
         <input type="email" id="email-input" placeholder="Email address">
         <div style="position: relative; width: 90%; margin: 10px auto;">
             <input type="password" id="password-input" placeholder="Password" style="width: 100%; margin: 0; padding-right: 40px;">
@@ -317,7 +329,7 @@ darabszamok: [12, 15, 15, 15, 15, 18, 18, 18, 18]
             },
             { id: "album_13", kepFajlNev: "Prerogative_of_the_Flame.jpg", en: "Prerogative of the Flame", de: "Vorrecht der Flamme", hu: "A Láng Előjoga", fr: "Prérogative de la Flamme", tr: "Alevin Ayrıcalığı", ru: "Прерогатива Пламени", ar: "امتياز اللهب",
               kartyaNevek: ["Whispers of the World", "Temptations of Power", "Doomsday Man", "The Hunters", "The Mad King", "The Last Empress", "The Last Collapse", "A Long Slumber", "Sky City"],
-darabszamok: [12, 15, 15, 15, 15, 18, 18, 18, 18]
+darabszamok: [9, 15, 15, 15, 15, 18, 18, 18, 18]
             },
             { id: "album_14", kepFajlNev: "Frostdragon_Empire.jpg", en: "Frostdragon Empire", de: "Frostdrachen-Imperium", hu: "Fagysárkány Birodalom", fr: "Empire du Dragon de Givre", tr: "Buz Ejderhası İmparatorluğu", ru: "Империя Ледяного Дракона", ar: "إمبراطورية تنين الصقيع",
               kartyaNevek: ["Frostdragon Empire", "The Dragonic Legend", "Wings of Empire", "The Dragonic Legion", "Rediscovery", "Future Vision", "War and Wealth", "Banquet for a King", "A Tyrant Crowned"],
@@ -463,28 +475,62 @@ document.getElementById('lang-selector').addEventListener('change', (e) => {
             });
         });
 
-        const authScreen = document.getElementById('auth-screen');
+const authScreen = document.getElementById('auth-screen');
         const profileScreen = document.getElementById('profile-setup-screen');
         const mainScreen = document.getElementById('main-app-screen');
+        const registerScreen = document.getElementById('register-screen'); // <-- ÚJ
 
         function showScreen(screen) {
-            authScreen.style.display = 'none'; profileScreen.style.display = 'none'; mainScreen.style.display = 'none';
+            authScreen.style.display = 'none';
+            profileScreen.style.display = 'none';
+            mainScreen.style.display = 'none';
+            if(registerScreen) registerScreen.style.display = 'none';
             screen.style.display = 'block';
         }
 
-        document.getElementById('email-register-btn').addEventListener('click', () => createUserWithEmailAndPassword(auth, document.getElementById('email-input').value, document.getElementById('password-input').value).catch(e => document.getElementById('auth-error').textContent = e.message));
-        document.getElementById('email-login-btn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email-input').value, document.getElementById('password-input').value).catch(e => document.getElementById('auth-error').textContent = "Incorrect login details."));
-        document.getElementById('google-login-btn').addEventListener('click', () => signInWithPopup(auth, provider).catch(e => console.error(e)));
+// Átlépés az új regisztrációs felületre
+        document.getElementById('email-register-btn').addEventListener('click', () => {
+            showScreen(registerScreen);
+        });
 
-        document.getElementById('save-profile-btn').addEventListener('click', async () => {
-            const pName = document.getElementById('player-name').value.trim();
-            const pServer = document.getElementById('server-number').value.trim();
-            const pAlliance = document.getElementById('alliance-name').value.trim().toUpperCase();
-            if(!pName || !pServer || !pAlliance) return document.getElementById('profile-error').textContent = "Please fill all fields!";
-            if((pServer.length !== 3 && pServer.length !== 4) || isNaN(pServer)) return document.getElementById('profile-error').textContent = "State must be 3 or 4 digits.";
-            if(pAlliance.length !== 3) return document.getElementById('profile-error').textContent = "Alliance must be 3 characters.";
-            await setDoc(doc(db, "jatekosok", window.currentUserUid), { jatekNev: pName, szerver: pServer, szovetseg: pAlliance, inventory: {} });
-            checkUserProfile(window.currentUserUid);
+        // Visszalépés a bejelentkezéshez
+        document.getElementById('back-to-login-btn').addEventListener('click', () => {
+            showScreen(authScreen);
+        });
+
+        // A tényleges regisztráció lebonyolítása mindennel együtt
+        document.getElementById('do-register-btn').addEventListener('click', async () => {
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const pName = document.getElementById('reg-player-name').value.trim();
+            const pServer = parseInt(document.getElementById('reg-server-number').value);
+            const pAlliance = document.getElementById('reg-alliance-name').value.trim().toUpperCase();
+            const errorDiv = document.getElementById('reg-error');
+
+            if (!email || !password || !pName || !pServer || pAlliance.length !== 3) {
+                errorDiv.textContent = "Please fill in all fields correctly (Alliance exactly 3 chars).";
+                return;
+            }
+
+            try {
+                // 1. Fiók létrehozása
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // 2. Profil azonnali mentése az adatbázisba
+                await setDoc(doc(db, "jatekosok", user.uid), {
+                    nev: email.split('@')[0], 
+                    jatekNev: pName,
+                    szerver: pServer,
+                    szovetseg: pAlliance,
+                    inventory: {}
+                });
+                
+                // 3. Frissítjük az oldalt, hogy automatikusan belépjen a főképernyőre
+                window.location.reload();
+            } catch (e) {
+                errorDiv.textContent = e.message;
+            }
         });
 
         async function checkUserProfile(uid) {
@@ -899,14 +945,28 @@ function updateQty(pieceId, change) {
                         });
                     });
 
-                                        let totalTrades = giveToMe.length + takeFromMe.length;
+// --- 1. Kiszámoljuk az ÖSSZES LÉTEZŐ darabot a játékban (pl. 500 db) ---
+                    let totalPiecesInGame = 0;
+                    window.gameData.forEach(a => a.cards.forEach(c => totalPiecesInGame += c.pieceCount));
+                    
+                    // --- 2. Megszámoljuk, hogy EBBŐL mennyi van meg a másik játékosnak ---
+                    let ownedUniquePieces = 0;
+                    for (const key in otherInv) { 
+                        if (otherInv[key] > 0) ownedUniquePieces++; 
+                    }
+                    
+                    // --- 3. Kiszámoljuk a %-ot: (Birtokolt darabok / Összes darab) * 100 ---
+                    let completionPct = totalPiecesInGame > 0 ? Math.round((ownedUniquePieces / totalPiecesInGame) * 100) : 0;
+                    if (completionPct > 100) completionPct = 100;
+
+                    let totalTrades = giveToMe.length + takeFromMe.length;
                     if (totalTrades > 0) {
                         hasMatches = true;
-                        // Az <details> és <summary> adja a lenyíló menüt!
                         resultsHtml += `
                         <details class="match-card" style="cursor:pointer;">
                             <summary style="outline: none; font-size: 18px; font-weight: bold; color: #e09f3e; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                👤 ${otherName} <span style="color:#fff; font-size:14px; font-weight:normal; float:right;">(${totalTrades} 🔄)</span>
+                                👤 ${otherName} <span style="color:#28a745; font-size:15px; margin-left: 8px; text-shadow: 1px 1px 2px black;">${completionPct}%</span>
+                                <span style="color:#fff; font-size:14px; font-weight:normal; float:right;">(${totalTrades} 🔄)</span>
                             </summary>
                             <div style="cursor:default; margin-top: 10px;">`;
                             
