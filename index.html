@@ -506,7 +506,7 @@ const authScreen = document.getElementById('auth-screen');
             const email = document.getElementById('reg-email').value.trim();
             const password = document.getElementById('reg-password').value;
             const pName = document.getElementById('reg-player-name').value.trim();
-            const pServer = parseInt(document.getElementById('reg-server-number').value);
+           const pServer = document.getElementById('reg-server-number').value.trim();
             const pAlliance = document.getElementById('reg-alliance-name').value.trim().toUpperCase();
             const errorDiv = document.getElementById('reg-error');
 
@@ -1133,6 +1133,7 @@ function updateQty(pieceId, change) {
 </body>
 
 </html>
+
 
 
 
