@@ -361,47 +361,6 @@ darabszamok: [12, 15, 15, 15, 15, 18, 18, 18, 18]
         });
 
         // --- GOMBOK ÉS ESEMÉNYEK ---
-
-		        // 1. E-mail belépés gomb
-        const emailLoginBtn = document.getElementById('email-login-btn');
-        if (emailLoginBtn) {
-            emailLoginBtn.addEventListener('click', async () => {
-                const email = document.getElementById('email-input').value.trim();
-                const password = document.getElementById('password-input').value;
-                const errorDiv = document.getElementById('auth-error');
-                
-                if (!email || !password) { 
-                    errorDiv.textContent = "Please fill in both fields."; 
-                    return; 
-                }
-
-                // Gomb letiltása és vizuális visszajelzés a kattintásról
-                const originalText = emailLoginBtn.textContent;
-                emailLoginBtn.textContent = "⏳ Logging in...";
-                emailLoginBtn.disabled = true;
-                errorDiv.textContent = ""; 
-                
-                try {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    
-                    // Sikeres belépés után letisztítjuk a beviteli mezőket (biztonság)
-                    document.getElementById('email-input').value = '';
-                    document.getElementById('password-input').value = '';
-                    
-                    // A gomb visszaállítása eredeti állapotba (bár a képernyő hamarosan eltűnik)
-                    emailLoginBtn.textContent = originalText;
-                    emailLoginBtn.disabled = false;
-                    
-                    // NEM kell window.location.reload()! 
-                    // A Firebase onAuthStateChanged automatikusan átváltja a képernyőt!
-                } catch (e) {
-                    // Ha hibás jelszót adtak meg, kiírjuk a hibát és újra kattinthatóvá tesszük a gombot
-                    errorDiv.textContent = "Error: " + e.message;
-                    emailLoginBtn.textContent = originalText;
-                    emailLoginBtn.disabled = false;
-                }
-            });
-		}
 		
 document.getElementById('lang-selector').addEventListener('change', (e) => {
             window.currLang = e.target.value;
@@ -1144,4 +1103,5 @@ function updateQty(pieceId, change) {
 </body>
 
 </html>
+
 
