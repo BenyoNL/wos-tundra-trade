@@ -590,9 +590,19 @@ async function checkUserProfile(uid) {
             } else { showScreen(profileScreen); }
         }
 
+window.isRegistering = false; // Alapértelmezett állapot
+
         onAuthStateChanged(auth, async (user) => {
-            if (user) { window.currentUserUid = user.uid; checkUserProfile(user.uid); } 
-            else { window.currentUserUid = null; showScreen(authScreen); }
+            // HA ÉPP REGISZTRÁLUNK, a háttérfigyelő ne szóljon bele a folyamatba!
+            if (window.isRegistering) return; 
+            
+            if (user) { 
+                window.currentUserUid = user.uid; 
+                checkUserProfile(user.uid); 
+            } else { 
+                window.currentUserUid = null; 
+                showScreen(authScreen); 
+            }
         });
 
         function hideAllViews() { 
@@ -1165,6 +1175,7 @@ document.getElementById("save-profile-btn").addEventListener("click", async () =
 </body>
 
 </html>
+
 
 
 
