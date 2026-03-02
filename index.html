@@ -354,13 +354,14 @@ darabszamok: [12, 15, 15, 15, 15, 18, 18, 18, 18]
                 cards: Array.from({length: 9}, (_, cIdx) => { 
                     const cName = album.kartyaNevek ? album.kartyaNevek[cIdx] : `Card ${cIdx+1}`;
                     const safeCardName = cName.replace(/ /g, '_').replace(/['"]/g, '');
-                    return {
-                        id: `${album.id}_card_${cIdx+1}`, 
-                        name: cName,
-                        image: `images/${baseAlbumName}_${safeCardName}.jpg`, 
-                        pieceCount: album.darabszamok ? album.darabszamok[cIdx] : 9,
-                        forbiddenPieces: album.tiltottDarabok ? album.tiltottDarabok[cIdx] : []
-                    };
+return {
+                    id: `${album.id}_card_${cIdx+1}`, 
+                    name: cName,
+                    image: `images/${baseAlbumName}_${safeCardName}.jpg`, 
+                    pieceCount: album.darabszamok ? album.darabszamok[cIdx] : 9,
+                    // ---> EZT A SORT ADJAD HOZZÁ: <---
+                    forbiddenPieces: album.tiltottDarabok ? album.tiltottDarabok[cIdx] : []
+                };
                 })
             };
         });
@@ -687,14 +688,15 @@ if (card.forbiddenPieces && card.forbiddenPieces.includes(p)) continue;
             const gridContainer = document.createElement('div');
             gridContainer.className = 'card-grid-container';
 
-            album.cards.forEach(card => {
-                let collectedPieces = 0;
-                for(let p = 1; p <= card.pieceCount; p++) {
-                    const pid = `${card.id}_piece_${p}`;
-                    if(window.userInventory[pid] && window.userInventory[pid] > 0) {
-                        collectedPieces++;
+album.cards.forEach(card => {
+                    let isComplete = true; 
+                    for(let p = 1; p <= card.pieceCount; p++) {
+                        const pid = `${card.id}_piece_${p}`;
+                        // INNEN KIVETTÜK A TILTÁST, mert a kártya befejezéséhez kellenek az 5 csillagosok is!
+                        if(!window.userInventory[pid] || window.userInventory[pid] === 0) { isComplete = false; break; }
                     }
-                }
+                    if(isComplete) completedCards++; 
+                });
                 const isComplete = collectedPieces === card.pieceCount;
                 const progressPct = Math.round((collectedPieces / card.pieceCount) * 100);
 
@@ -987,6 +989,7 @@ function updateQty(pieceId, change) {
                         const aName = album.names[window.currLang] || album.names['en'];
                         album.cards.forEach(card => {
                             for(let p = 1; p <= card.pieceCount; p++) {
+if (card.forbiddenPieces && card.forbiddenPieces.includes(p)) continue;
                                 const pieceId = `${card.id}_piece_${p}`;
                                 const myQty = window.userInventory[pieceId] || 0;
                                 const otherQty = otherInv[pieceId] || 0;
@@ -1179,4 +1182,14 @@ document.getElementById("save-profile-btn").addEventListener("click", async () =
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
 
