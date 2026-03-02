@@ -279,7 +279,8 @@ const i18n = {
         const albumAdatok = [
             { id: "album_0", kepFajlNev: "Rekindled_Flames.jpg", en: "Rekindled Flames", de: "Wiederentfachte Flammen", hu: "Újraéledő Lángok", fr: "Flammes ravivées", tr: "Yeniden Alevlenen", ru: "Вновь зажженное", ar: "نيران مشتعلة",
               kartyaNevek: ["Furnace", "City Founding", "Dawn Alliance", "Decisions", "Menace Afoot", "Heroes", "Food Power", "A New Order", "True Explorer"],
-darabszamok: [9, 9, 9, 12, 12, 12, 15, 15, 15] 
+darabszamok: [9, 9, 9, 12, 12, 12, 15, 15, 15],
+tiltottDarabok: [[], [], [], [], [], [], [], [], [13, 14, 15]]
             },
             { id: "album_1", kepFajlNev: "Explore_the_World.jpg", en: "Explore the World", de: "Erkunde die Welt", hu: "Fedezd fel a Világot", fr: "Explorer le monde", tr: "Dünyayı Keşfet", ru: "Исследуй мир", ar: "استكشف العالم",
               kartyaNevek: ["War on Winter", "Exploration Journal", "Hunting Guild", "The Raging Bear", "Treasure Kingdom", "Wealth Is Knowledge", "Ruins of Old", "Cryptid Days", "Call of the Stars"],
@@ -291,7 +292,8 @@ darabszamok: [9, 12, 12, 12, 15, 15, 15, 18, 18]
             },
             { id: "album_3", kepFajlNev: "Tundra_Alliance.jpg", en: "Tundra Alliance", de: "Tundra-Allianz", hu: "Tundra Szövetség", fr: "Alliance de la Toundra", tr: "Tundra İttifakı", ru: "Альянс Тундры", ar: "تحالف التندرا",
               kartyaNevek: ["Alliance-Building", "One Heart", "Heroes' Aid", "Alliance Resources", "Twisted Obsession", "Virtues and Crimes", "Children of the \"New World\"", "Horn of Command", "Battlefield Epic"],
-darabszamok: [12, 12, 15, 15, 15, 18, 18, 18, 18] 
+darabszamok: [12, 12, 15, 15, 15, 18, 18, 18, 18],
+
             },
             { id: "album_4", kepFajlNev: "Battlefield_Epic.jpg", en: "Battlefield Epic", de: "Schlachtfeld-Epos", hu: "Csatatéri Eposz", fr: "Épopée du champ de bataille", tr: "Savaş Alanı Destanı", ru: "Эпос поля боя", ar: "ملحمة ساحة المعركة",
               kartyaNevek: ["Imperial Foundry", "King of the Battlefield", "Orichalcum", "City of Kings", "Pilot's Paradise", "Great Contest", "Canyon Clash", "Hero's Glory", "Grand Banquet"],
@@ -356,7 +358,8 @@ darabszamok: [12, 15, 15, 15, 15, 18, 18, 18, 18]
                         id: `${album.id}_card_${cIdx+1}`, 
                         name: cName,
                         image: `images/${baseAlbumName}_${safeCardName}.jpg`, 
-                        pieceCount: album.darabszamok ? album.darabszamok[cIdx] : 9
+                        pieceCount: album.darabszamok ? album.darabszamok[cIdx] : 9,
+                        forbiddenPieces: album.tiltottDarabok ? album.tiltottDarabok[cIdx] : []
                     };
                 })
             };
@@ -627,6 +630,7 @@ window.isRegistering = false; // Alapértelmezett állapot
                     let isComplete = true;
                     for(let p = 1; p <= card.pieceCount; p++) {
                         const pid = `${card.id}_piece_${p}`;
+if (card.forbiddenPieces && card.forbiddenPieces.includes(p)) continue;
                         if(!window.userInventory[pid] || window.userInventory[pid] === 0) { isComplete = false; break; }
                     }
                     if(isComplete) completedCards++;
@@ -1095,7 +1099,7 @@ function updateQty(pieceId, change) {
                                 const pieceId = `${card.id}_piece_${p}`;
                                 const myQty = window.userInventory[pieceId] || 0;
                                 const otherQty = otherInv[pieceId] || 0;
-
+if (card.forbiddenPieces && card.forbiddenPieces.includes(p)) continue;
                                 if ((myQty === 0 && otherQty >= 2) || (myQty >= 2 && otherQty === 0)) {
                                     userTradeCount++;
                                 }
@@ -1175,15 +1179,4 @@ document.getElementById("save-profile-btn").addEventListener("click", async () =
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
 
