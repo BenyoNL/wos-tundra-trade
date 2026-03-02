@@ -1131,35 +1131,41 @@ function updateQty(pieceId, change) {
         });
 
 		// --- PROFIL MENTÉSE ÉS TOVÁBBLÉPÉS JAVÍTÁS ---
-document.getElementById('save-profile-btn').addEventListener('click', () => {
-    const nickname = document.getElementById('nickname').value.trim();
-    const server = document.getElementById('server-number').value.trim();
-    const alliance = document.getElementById('alliance-name').value.trim();
+document.getElementById("save-profile-btn").addEventListener("click", async () => {
+  const name = document.getElementById("player-name").value.trim();
+  const server = document.getElementById("server-number").value.trim();
+  const alliance = document.getElementById("alliance-name").value.trim().toUpperCase();
 
-    if (nickname === "" || server === "" || alliance === "") {
-        alert("Kérlek, tölts ki minden mezőt!");
-        return;
-    }
+  if (!name || !server || alliance.length !== 3) {
+    document.getElementById("profile-error").innerText =
+      "Please fill all fields correctly (Alliance = 3 chars)";
+    return;
+  }
 
-    // Adatok mentése a böngésző memóriájába (opcionális)
-    localStorage.setItem('userNickname', nickname);
-    localStorage.setItem('userServer', server);
-    localStorage.setItem('userAlliance', alliance);
+  try {
+    await setDoc(doc(db, "users", currentUserUid), {
+      name,
+      server,
+      alliance
+    }, { merge: true });
 
-    // Profil ablak elrejtése és a főmenü megjelenítése
-    document.getElementById('setup-profile-screen').style.display = 'none';
-    document.getElementById('main-menu').style.display = 'block';
-    
-    // Üdvözlő szöveg frissítése a névvel
-    const welcomeMsg = document.querySelector('#main-menu h2');
-    if(welcomeMsg) {
-        welcomeMsg.textContent = "Üdvözlünk, " + nickname + "!";
-    }
+    document.getElementById("profile-setup-screen").style.display = "none";
+    document.getElementById("main-app-screen").style.display = "block";
+
+    document.getElementById("display-name").innerText = name;
+    document.getElementById("display-server").innerText = server;
+    document.getElementById("display-alliance").innerText = alliance;
+
+    showToast();
+  } catch (err) {
+    document.getElementById("profile-error").innerText = err.message;
+  }
 });
     </script>
 </body>
 
 </html>
+
 
 
 
