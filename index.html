@@ -1137,7 +1137,7 @@ document.getElementById("save-profile-btn").addEventListener("click", async () =
   const szerver = document.getElementById("server-number").value.trim();
   const szovetseg = document.getElementById("alliance-name").value.trim().toUpperCase();
 
-  if (!name || !server || alliance.length !== 3) {
+  if (!jatekNev || !szerver || szovetseg.length !== 3) {
     document.getElementById("profile-error").innerText =
       "Please fill all fields correctly (Alliance = 3 chars)";
     return;
@@ -1166,6 +1166,7 @@ document.getElementById("save-profile-btn").addEventListener("click", async () =
 </body>
 
 </html>
+
 
 
 
