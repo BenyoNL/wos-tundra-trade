@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whiteout Survival - Tundra Trade</title>
+    <title>Whiteout Survival - Puzzle Trade</title>
+	<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 20px; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #eef2f5; min-height: 100vh; }
         .container { background: rgba(25, 35, 50, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); max-width: 800px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
@@ -23,7 +24,7 @@
         
         .list-item { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.05); color: white; border-radius: 12px; margin: 15px auto; cursor: pointer; width: 90%; transition: transform 0.1s, background 0.2s; text-align: left; }
         .list-item:hover { background: rgba(0, 0, 0, 0.6); }
-        .list-item:active { transform: scale(0.98); }
+        .list-item button:active, .search-item button:active, .card-item button:active { transform: scale(0.90); }
         
         .album-card { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
         .album-img-large { width: 100%; height: 400px; object-fit: cover; border-bottom: 3px solid #e09f3e; display: block; border-radius: 12px 12px 0 0; }
@@ -151,7 +152,7 @@
 <div id="auth-screen" class="container">
     <div style="margin-bottom: 30px;">
         <h1 style="color: #e09f3e; font-size: 32px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px;">Whiteout Survival</h1>
-        <h2 style="color: #fff; margin-top: 0; font-weight: normal; font-size: 22px;">❄️ Tundra Trade ❄️</h2>
+        <h2 style="color: #fff; margin-top: 0; font-weight: normal; font-size: 22px;">❄️ Tundra Album Trader ❄️</h2>
         <p style="color: #aaa; font-style: italic;">The Ultimate Puzzle Exchange Tool</p>
     </div>
 
@@ -194,26 +195,37 @@
         <button id="save-profile-btn" class="btn btn-green">Save & Continue</button>
     </div>
 
-    <div id="main-app-screen" class="container" style="display: none;">
-<div id="top-bar">
-            <div style="text-align: left;">
-                <h3 style="margin: 0; color:#e09f3e;" id="display-name"></h3>
-                <small style="color: #ccc; display: block; margin-bottom: 8px;"><span class="t-state">State</span>: <b id="display-server" style="color:#fff;"></b> | <span class="t-alliance">Alliance</span>: <b id="display-alliance" style="color:#fff;"></b></small>
-                <button id="logout-btn" class="btn btn-back t-btn-logout" style="margin: 0; padding: 4px 10px; font-size: 12px;">Logout</button>
-            </div>
-            <div>
-                <select id="lang-selector">
-                    <option value="en" selected>🇬🇧 English</option>
-                    <option value="hu">🇭🇺 Magyar</option>
-                    <option value="de">🇩🇪 Deutsch</option>
-                    <option value="fr">🇫🇷 Français</option>
-                    <option value="tr">🇹🇷 Türkçe</option>
-                    <option value="ru">🇷🇺 Русский</option>
-                    <option value="ar">🇸🇦 العربية</option>
-                </select>
-            </div>
-        </div>
+<div id="main-app-screen" class="container" style="display: none;">
         
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <select id="lang-selector" style="width: auto; padding: 5px 10px; margin: 0; font-size: 0.9em; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 5px;">
+                <option value="en" selected>🇬🇧 English</option>
+                <option value="hu">🇭🇺 Magyar</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="tr">🇹🇷 Türkçe</option>
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="ar">🇸🇦 العربية</option>
+            </select>
+            <button id="logout-btn" class="btn btn-back t-btn-logout" style="margin: 0; padding: 5px 15px; font-size: 0.9em; background: #c0392b;">Logout</button>
+        </div>
+
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+           <h2 style="margin: 0; font-size: 1.5em; color: #e09f3e;"><span id="display-name">Játékos</span></h2>
+            <p style="margin: 5px 0 0 0; color: #ccc;"><span class="t-state">State</span>: <span id="display-server" style="color:#fff; font-weight:bold;">0</span> | <span class="t-alliance">Alliance</span>: <span id="display-alliance" style="color:#fff; font-weight:bold;">---</span></p>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: stretch; gap: 10px; margin-bottom: 20px;">
+            <a href="Tundra_Album_Trade_Pro_Template.xlsx" download target="_blank" class="btn" style="background: #34495e; padding: 10px; font-size: 0.9em; flex: 1; text-align: center; text-decoration: none; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 1px solid transparent;" id="txt-excel-download">📄 Sablon</a>
+            
+            <button id="import-excel-btn" class="btn btn-green" style="padding: 10px; font-size: 0.9em; flex: 1; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 1px solid transparent;" id="txt-excel-upload">💻➡️☁️ Upload</button>
+            
+            <button id="btn-download" class="btn" style="background: #f39c12; padding: 10px; font-size: 0.9em; flex: 1; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 1px solid transparent;" onclick="exportMyCards()">☁️➡️💻 Download</button>
+            
+            <input type="file" id="excel-upload" style="display:none" accept=".xlsx, .xls">
+        </div>
+	
+	
         <div class="action-buttons" style="display: flex; justify-content: space-between; gap: 5px;">
             <button id="btn-match-clan" class="btn btn-blue t-btn-clan" style="flex: 2; font-size: 13px; padding: 10px 5px; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4); position: relative;">🤝 Search in Alliance<span id="badge-clan" class="trade-badge">0</span></button>
             <button id="btn-match-state" class="btn btn-dark t-btn-state" style="flex: 2; font-size: 13px; padding: 10px 5px; position: relative;">🌍 Search in State<span id="badge-state" class="trade-badge">0</span></button>
@@ -358,8 +370,150 @@ darabszamok: [12, 15, 15, 15, 15, 18, 18, 18, 18] ,
 			 tiltottDarabok: [[], [15], [15], [14, 15], [13, 14, 15], [14, 15, 16, 17, 18], [14, 15, 16, 17, 18], [12, 13, 14, 15, 16, 17, 18], [13, 14, 15, 16, 17, 18]]
             }
         ];
+// --- EXCEL FELTÖLTÉS ÉS MENTÉS LOGIKA ---
+document.getElementById('import-excel-btn').addEventListener('click', () => {
+    document.getElementById('excel-upload').click();
+});
 
-        window.gameData = albumAdatok.map((album) => {
+document.getElementById('excel-upload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return; 
+    
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(firstSheet);
+
+        let newInventory = {}; 
+
+        rows.forEach(row => {
+            const album = window.gameData.find(a => (a.names['en'] || a.names['hu']) === row.Album);
+            if (!album) return;
+
+            const card = album.cards.find(c => c.name === row.Card);
+            if (!card) return;
+
+            for (let p = 1; p <= 18; p++) {
+                const val = row[`Piece ${p}`];
+                const qty = parseInt(val);
+                if (!isNaN(qty) && qty > 0) {
+                    newInventory[`${card.id}_piece_${p}`] = qty;
+                }
+            }
+        });
+
+        // 8 NYELVŰ FIGYELMEZTETÉS ÉS SIKER ÜZENET
+        const lang = window.currLang || 'en';
+        const messages = {
+            en: { warn: "Are you sure you want to OVERWRITE your current puzzle pieces with this Excel file?", success: "Success! Your inventory has been updated." },
+            hu: { warn: "Biztosan FELÜLÍROD a jelenlegi kártyáidat az Excel tartalmával?", success: "Sikeres importálás! Az adataid frissültek." },
+            de: { warn: "Möchten Sie Ihre aktuellen Puzzleteile wirklich mit dieser Excel-Datei ÜBERSCHREIBEN?", success: "Erfolg! Ihr Inventar wurde aktualisiert." },
+            fr: { warn: "Êtes-vous sûr de vouloir ÉCRASER vos pièces actuelles avec ce fichier Excel ?", success: "Succès ! Votre inventaire a été mis à jour." },
+            tr: { warn: "Mevcut yapboz parçalarınızı bu Excel dosyasıyla ÜZERİNE YAZMAK istediğinizden emin misiniz?", success: "Başarılı! Envanteriniz güncellendi." },
+            ru: { warn: "Вы уверены, что хотите ПЕРЕЗАПИСАТЬ свои текущие пазлы этим файлом Excel?", success: "Успех! Ваш инвентарь обновлен." },
+            ar: { warn: "هل أنت متأكد أنك تريد استبدال قطع اللغز الحالية بملف الإكسل هذا؟", success: "نجاح! تم تحديث المخزون الخاص بك." },
+            es: { warn: "¿Estás seguro de que quieres SOBRESCRIBIR tus piezas actuales con este archivo Excel?", success: "¡Éxito! Tu inventario ha sido actualizado." }
+        };
+
+        const currentMsgs = messages[lang] || messages['en'];
+
+        if (confirm(currentMsgs.warn)) {
+            // JAVÍTVA: A felesleges window.fbSDK eltávolítva, közvetlenül a db-t használjuk!
+            setDoc(doc(db, "jatekosok", window.currentUserUid), {
+                inventory: newInventory
+            }, { merge: true }).then(() => {
+                alert(currentMsgs.success);
+                location.reload();
+            }).catch(err => {
+                console.error(err);
+                alert("Error saving data: " + err.message);
+            });
+        }
+        
+        document.getElementById('excel-upload').value = "";
+    };
+    reader.readAsArrayBuffer(file);
+});
+
+window.exportMyCards = function() {
+    if (!window.userInventory) {
+        alert("Hiba: Nincsenek kártyák betöltve!");
+        return;
+    }
+    
+    // 1. Fejléc létrehozása pontosan a sablon formátuma szerint
+    let headerRow = ["Album", "Card"];
+    for (let i = 1; i <= 18; i++) {
+        headerRow.push(`Piece ${i}`);
+    }
+    let data = [headerRow];
+    
+    // 2. Kártyák és darabszámok kigyűjtése mátrix formában
+    window.gameData.forEach(album => {
+        // Az import az angol vagy magyar nevet is felismeri, használjuk az aktuálisat
+        const aName = album.names[window.currLang] || album.names['en'];
+        
+        album.cards.forEach(card => {
+            let row = [aName, card.name]; // Sor kezdése az albummal és kártyanévvel
+            
+            // 18 oszlop feltöltése
+            for(let p = 1; p <= 18; p++) {
+                if (p <= card.pieceCount) {
+                    // Ha létezik a darab az adott kártyához, beírjuk a mennyiséget (ha 0, akkor 0-t)
+                    const qty = window.userInventory[`${card.id}_piece_${p}`] || 0;
+                    row.push(qty);
+                } else {
+                    // Ha a kártya pl. csak 9 darabos, a 10-18. oszlopokat üresen hagyjuk
+                    row.push(""); 
+                }
+            }
+            data.push(row);
+        });
+    });
+
+    // 3. Excel fájl generálása és letöltése
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Tundra Album Trade");
+    XLSX.writeFile(workbook, "Tundra_Album_Trade_Export.xlsx");
+};
+
+// --- EXCEL GOMBOK TÖBBNYELVŰSÍTÉSE (8 Nyelv) ---
+const excelTranslations = {
+    en: { download: "📄 Template", upload: "💻➡️☁️ Upload", export: "☁️➡️💻 Download" },
+    hu: { download: "📄 Sablon", upload: "💻➡️☁️ Feltöltés", export: "☁️➡️💻 Letöltés" },
+    de: { download: "📄 Vorlage", upload: "💻➡️☁️ Hochladen", export: "☁️➡️💻 Herunterladen" },
+    fr: { download: "📄 Modèle", upload: "💻➡️☁️ Importer", export: "☁️➡️💻 Télécharger" },
+    tr: { download: "📄 Şablon", upload: "💻➡️☁️ Yükle", export: "☁️➡️💻 İndir" },
+    ru: { download: "📄 Шаблон", upload: "💻➡️☁️ Загрузить", export: "☁️➡️💻 Скачать" },
+    ar: { download: "📄 نموذج", upload: "💻➡️☁️ رفع", export: "☁️➡️💻 تنزيل" },
+    es: { download: "📄 Plantilla", upload: "💻➡️☁️ Subir", export: "☁️➡️💻 Descargar" }
+};
+
+// Létrehozunk egy függvényt, ami beállítja a szövegeket
+window.updateExcelUI = function() {
+    const lang = window.currLang || 'en';
+    const exT = excelTranslations[lang] || excelTranslations['en'];
+    if(document.getElementById('txt-excel-title')) document.getElementById('txt-excel-title').innerText = exT.title;
+    if(document.getElementById('txt-excel-desc')) document.getElementById('txt-excel-desc').innerText = exT.desc;
+    if(document.getElementById('txt-excel-download')) document.getElementById('txt-excel-download').innerText = exT.download;
+    if(document.getElementById('import-excel-btn')) document.getElementById('import-excel-btn').innerText = exT.upload;
+};
+
+// Automatikusan lefuttatjuk induláskor
+window.updateExcelUI();
+
+// Hogy nyelvváltoztatáskor is frissüljön, ráakasztjuk az oldal összes kattintására,
+// így ha a felhasználó rákattint egy zászlóra vagy a nyelvválasztóra, a gombok is frissülnek!
+document.addEventListener('click', () => {
+    setTimeout(window.updateExcelUI, 100); 
+});
+		
+		
+	window.gameData = albumAdatok.map((album) => {
             const baseAlbumName = album.kepFajlNev.replace('.jpg', ''); 
             return {
                 id: album.id,
@@ -417,8 +571,9 @@ document.getElementById('lang-selector').addEventListener('change', (e) => {
         document.getElementById('btn-match-state').addEventListener('click', () => runMatchmaker('state'));
         document.getElementById('btn-match-global').addEventListener('click', () => runMatchmaker('global'));
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+		
 
-// Segédfüggvény a keresőből történő azonnali módosításhoz
+            // Segédfüggvény a keresőből történő azonnali módosításhoz
         window.searchUpdateQty = function(pieceId, change, elementId) {
             let currentQty = window.userInventory[pieceId] || 0;
             currentQty += change;
@@ -460,15 +615,15 @@ document.getElementById('lang-selector').addEventListener('change', (e) => {
                     if (card.name.toLowerCase().includes(queryText)) {
                         foundSomething = true;
                         
-                        const res = document.createElement('div');
-                        res.className = 'list-item search-item card-item';
-                        res.style.cursor = 'default'; // Ne a teljes doboz legyen kattintható, csak a gombok
+const res = document.createElement('div');
+res.className = 'match-card'; 
+res.style.cursor = 'default';
                         
                         // Kártya fejléc
                         let html = `
                         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:10px;">
                             <div>
-                                <strong style="color:#e09f3e; font-size:18px;">${card.name}</strong> <span style="color:#ffc107; font-size:14px;">(${card.stars}⭐)</span><br>
+                                <strong style="color:#e09f3e; font-size:18px;">${card.name}</strong> <span style="color:#ffc107; font-size:14px;"></span><br>
                                 <span style="color:#aaa; font-size:13px;">${aName}</span>
                             </div>
                             <button class="btn btn-blue btn-small" style="margin:0; width:auto;" onclick="renderPuzzle(window.gameData.find(a=>a.id==='${album.id}'), window.gameData.find(a=>a.id==='${album.id}').cards.find(c=>c.id==='${card.id}'))">Ugrás a kártyához ❯</button>
@@ -486,10 +641,10 @@ document.getElementById('lang-selector').addEventListener('change', (e) => {
                                 <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.5); padding:6px 10px; border-radius:8px;">
                                     <button class="btn btn-red" style="margin:0; width:45px; padding:2px 0; font-size:22px; box-shadow:none;" onclick="searchUpdateQty('${pieceId}', -1, 'sqty-${pieceId}')">➖</button>
                                     
-                                    <div style="flex-grow:1; text-align:center; font-size:15px; color:#fff;">
-                                        ${card.name} / ${p}. darab<br>
-                                        <span style="font-size:13px; color:#888;">(Megvan: <b id="sqty-${pieceId}" style="color:${color}; font-size:15px;">${currentQty}</b> db)</span>
-                                    </div>
+<div style="flex-grow:1; text-align:center; font-size:15px; color:#fff;">
+    ${card.name} / ${p}. ${window.currLang === 'hu' ? 'darab' : 'piece'}<br>
+    <span style="font-size:13px; color:#888;">(${window.currLang === 'hu' ? 'Megvan' : 'Owned'}: <b id="sqty-${pieceId}" style="color:${color}; font-size:15px;">${currentQty}</b> ${window.currLang === 'hu' ? 'db' : 'pcs'})</span>
+</div>
                                     
                                     <button class="btn btn-green" style="margin:0; width:45px; padding:2px 0; font-size:22px; box-shadow:none;" onclick="searchUpdateQty('${pieceId}', 1, 'sqty-${pieceId}')">➕</button>
                                 </div>
@@ -835,7 +990,7 @@ let statusHtml = '';
             viewCards.style.display = 'block';
         }
 
-        function renderPuzzle(album, card) {
+        window.renderPuzzle = function(album, card) {
             hideAllViews();
             window.currentAlbumGlobal = album; window.currentCardGlobal = card;
             const viewPuzzle = document.getElementById('view-puzzle');
@@ -1245,6 +1400,9 @@ document.getElementById("save-profile-btn").addEventListener("click", async () =
 </body>
 
 </html>
+
+
+
 
 
 
