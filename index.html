@@ -197,11 +197,9 @@
 <div id="banned-screen" class="container" style="display: none;">
     <h2 style="color: #ff6b6b; font-size: 28px;">Access Denied</h2>
     <p style="color: #fff; font-size: 16px; line-height: 1.6; text-align: justify; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
-        Dear #2243!<br><br>
+        Dear User.<br><br>
         I created this website to help players exchange puzzle pieces. 
-        Since someone removed me from the 2243 Discord server without saying anything, I don't think it would be fair for you to use it. (I only asked for pictures so that the page would be more informative.) <br><br>
-		I'm sorry and thank you for your understanding. If you would like to continue using it, please talk to the admin of the Discord server.<br><br>
-		Benyo
+        Since someone removed me from the 2243 discord server without saying anything, I don't think it would be fair for you to use it. I'm sorry and thank you for your understanding. If you would like to continue using it, please talk to the admin of the Discord server.
     </p>
     <button id="banned-logout-btn" class="btn btn-back" style="margin-top: 20px; background: #c0392b; color: white; width: 100%;">Logout / Vissza a belépéshez</button>
 </div>
@@ -221,9 +219,18 @@
             <button id="logout-btn" class="btn btn-back t-btn-logout" style="margin: 0; padding: 5px 15px; font-size: 0.9em; background: #c0392b;">Logout</button>
         </div>
 
-<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-           <h2 style="margin: 0; font-size: 1.5em; color: #e09f3e;"><span id="display-name">Játékos</span></h2>
-            <p style="margin: 5px 0 0 0; color: #ccc;"><span class="t-state">State</span>: <span id="display-server" style="color:#fff; font-weight:bold;">0</span> | <span class="t-alliance">Alliance</span>: <span id="display-alliance" style="color:#fff; font-weight:bold;">---</span></p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 id="edit-name-btn" style="margin: 0; font-size: 1.5em; color: #e09f3e; cursor: pointer;" title="Kattints ide a név megváltoztatásához"><span id="display-name">Játékos</span> <span style="font-size: 14px; opacity: 0.7;">✏️</span></h2>
+                <p style="margin: 5px 0 0 0; color: #ccc;">
+                    <span class="t-state">State</span>: <span id="display-server" style="color:#fff; font-weight:bold;">0</span> | 
+                    <span class="t-alliance">Alliance</span>: <span id="display-alliance" style="color:#fff; font-weight:bold;">---</span>
+                </p>
+            </div>
+            <div id="transfer-server-btn" style="display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; padding: 5px 10px; border-radius: 8px; transition: background 0.2s; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                <span style="font-size: 24px;">🌍</span>
+                <span style="font-size: 10px; color: #ccc; font-weight: bold; margin-top: 4px; text-transform: uppercase;">Transfer</span>
+            </div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: stretch; gap: 10px; margin-bottom: 20px;">
@@ -275,8 +282,7 @@ const firebaseConfig = {
   messagingSenderId: "469371801375",
   appId: "1:469371801375:web:71007b232a98fe8bdbea2a",
   measurementId: "G-2LQT9X23X5"
-};
-
+};;
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -289,14 +295,14 @@ const firebaseConfig = {
         window.currentCardGlobal = null;
 
 const i18n = {
-            en: { state: "State", alliance: "Alliance", btnClan: "🤝 Search in Alliance", btnState: "🌍 Search in State", btnGlobal: "🌌 Search in All States", searchPh: "🔍 Search album or card...", btnSave: "💾 Save Changes", btnLogout: "Logout", backAlbum: "⬅ Back to Albums", backCard: "⬅ Back to Cards", markDone: "✔ Set missing to 1", cardsOwnedInfo: "Completed Cards", givesYou: "They can give you:", asksFrom: "They ask from you:", traded: "Traded!", noMatch: "No matching players found.", tradeWarning: "⚠️ Only click 'Traded!' if the exchange actually happened in the game!", videoSearch: "⏳ Searching...", videoPending: "Video upload in progress..." },
-            de: { state: "Staat", alliance: "Allianz", btnClan: "🤝 Suche in Allianz", btnState: "🌍 Suche im Staat", btnGlobal: "🌌 Suche in Allen Staaten", searchPh: "🔍 Album suchen...", btnSave: "💾 Speichern", btnLogout: "Abmelden", backAlbum: "⬅ Zurück", backCard: "⬅ Zurück", markDone: "✔ Fehlende auf 1", cardsOwnedInfo: "Komplette Karten", givesYou: "Kann dir geben:", asksFrom: "Fragt von dir:", traded: "Gehandelt!", noMatch: "Keine passenden Spieler gefunden.", tradeWarning: "⚠️ Klicke nur auf 'Traded!', wenn der Tausch im Spiel stattfand!", videoSearch: "⏳ Suchen...", videoPending: "Video-Upload läuft..." },
-            fr: { state: "État", alliance: "Alliance", btnClan: "🤝 Chercher dans l'Alliance", btnState: "🌍 Chercher dans l'État", btnGlobal: "🌌 Chercher dans Tous les États", searchPh: "🔍 Chercher...", btnSave: "💾 Sauvegarder", btnLogout: "Déconnexion", backAlbum: "⬅ Retour", backCard: "⬅ Retour", markDone: "✔ Marquer à 1", cardsOwnedInfo: "Cartes complètes", givesYou: "Peut vous donner:", asksFrom: "Vous demande:", traded: "Échangé!", noMatch: "Aucun joueur correspondant.", tradeWarning: "⚠️ Ne cliquez sur 'Échangé' que si l'échange a eu lieu dans le jeu !", videoSearch: "⏳ Recherche...", videoPending: "Téléchargement de la vidéo en cours..." },
-            tr: { state: "Eyalet", alliance: "İttifak", btnClan: "🤝 İttifakta Ara", btnState: "🌍 Eyalette Ara", btnGlobal: "🌌 Tüm Eyaletlerde Ara", searchPh: "🔍 Ara...", btnSave: "💾 Kaydet", btnLogout: "Çıkış Yap", backAlbum: "⬅ Albümlere Dön", backCard: "⬅ Kartlara Dön", markDone: "✔ Eksikleri 1 yap", cardsOwnedInfo: "Tamamlanan kartlar", givesYou: "Sana verebilir:", asksFrom: "Senden istiyor:", traded: "Takas edildi!", noMatch: "Eşleşen oyuncu bulunamadı.", tradeWarning: "⚠️ Yalnızca oyun içinde takas gerçekleştiyse 'Takas edildi!' butonuna tıklayın!", videoSearch: "⏳ Aranıyor...", videoPending: "Video yüklemesi devam ediyor..." },
-            hu: { state: "Állam", alliance: "Szövetség", btnClan: "🤝 Keresés Szövetségben", btnState: "🌍 Keresés Államban", btnGlobal: "🌌 Keresés Minden Államban", searchPh: "🔍 Keresés albumra vagy kártyára...", btnSave: "💾 Változások Mentése", btnLogout: "Kijelentkezés", backAlbum: "⬅ Vissza az Albumokhoz", backCard: "⬅ Vissza a Kártyákhoz", markDone: "✔ Hiányzók 1-re állítása", cardsOwnedInfo: "Ezek a kártyák megvannak", givesYou: "Tud adni neked:", asksFrom: "Kéri tőled:", traded: "Elcseréltük!", noMatch: "Nincs találat a cserepartnerekre.", tradeWarning: "⚠️ Csak akkor kattints a 'Traded!' gombra, ha a játékban is megtörtént a csere!", videoSearch: "⏳ Keresés...", videoPending: "A videó feltöltése folyamatban..." },
-	    ru: { state: "Штат", alliance: "Альянс", btnClan: "🤝 Поиск в альянсе", btnState: "🌍 Поиск в штате", btnGlobal: "🌌 Поиск во всех штатах", searchPh: "🔍 Поиск...", btnSave: "💾 Сохранить", btnLogout: "Выйти", backAlbum: "⬅ Назад", backCard: "⬅ Назад", markDone: "✔ На 1", cardsOwnedInfo: "Собранные карты", givesYou: "Может дать вам:", asksFrom: "Просит у вас:", traded: "Обменялись!", noMatch: "Игроков не найдено.", tradeWarning: "⚠️ Нажимайте 'Обменялись!' только если обмен уже произошел в игре!", videoSearch: "⏳ Поиск...", videoPending: "Идет загрузка видео..." },
-            ar: { state: "حالة", alliance: "تحالف", btnClan: "🤝 البحث في التحالف", btnState: "🌍 البحث في الولاية", btnGlobal: "🌌 البحث في كل الولايات", searchPh: "🔍 البحث...", btnSave: "💾 حفظ التغييرات", btnLogout: "تسجيل خروج", backAlbum: "⬅ العودة", backCard: "⬅ العودة", markDone: "✔ تعيين إلى 1", cardsOwnedInfo: "بطاقات مكتملة", givesYou: "يمكن أن يعطيك:", asksFrom: "يطلب منك:", traded: "تم التبادل!", noMatch: "لم يتم العثور على لاعبين.", tradeWarning: "⚠️ انقر فقط على 'تم التبادل!' إذا حدث التبادل بالفعل في اللعبة!", videoSearch: "⏳ جاري البحث...", videoPending: "جاري تحميل الفيديو..." }
-        };
+    en: { state: "State", alliance: "Alliance", btnClan: "🤝 Search in Alliance", btnState: "🌍 Search in State", btnGlobal: "🌌 Search in All States", searchPh: "🔍 Search album or card...", btnSave: "💾 Save Changes", btnLogout: "Logout", backAlbum: "⬅ Back to Albums", backCard: "⬅ Back to Cards", markDone: "✔ Set missing to 1", cardsOwnedInfo: "Completed Cards", givesYou: "They can give you:", asksFrom: "They ask from you:", traded: "Traded!", noMatch: "No matching players found.", tradeWarning: "⚠️ Only click 'Traded!' if the exchange actually happened in the game!", videoSearch: "⏳ Searching...", videoPending: "Video upload in progress...", promptName: "Enter your new player name:", promptState: "Enter your new State (Server):", promptAlliance: "Enter your new Alliance tag (exactly 3 chars):", errAlliance: "Alliance tag must be exactly 3 characters!", errBan: "You cannot transfer to this server!", errSave: "Error saving: " },
+    de: { state: "Staat", alliance: "Allianz", btnClan: "🤝 Suche in Allianz", btnState: "🌍 Suche im Staat", btnGlobal: "🌌 Suche in Allen Staaten", searchPh: "🔍 Album suchen...", btnSave: "💾 Speichern", btnLogout: "Abmelden", backAlbum: "⬅ Zurück", backCard: "⬅ Zurück", markDone: "✔ Fehlende auf 1", cardsOwnedInfo: "Komplette Karten", givesYou: "Kann dir geben:", asksFrom: "Fragt von dir:", traded: "Gehandelt!", noMatch: "Keine passenden Spieler gefunden.", tradeWarning: "⚠️ Klicke nur auf 'Traded!', wenn der Tausch im Spiel stattfand!", videoSearch: "⏳ Suchen...", videoPending: "Video-Upload läuft...", promptName: "Gib deinen neuen Spielernamen ein:", promptState: "Gib deinen neuen Staat (Server) ein:", promptAlliance: "Gib deine neue Allianz ein (genau 3 Zeichen):", errAlliance: "Das Allianz-Kürzel muss genau 3 Zeichen lang sein!", errBan: "Du kannst nicht auf diesen Server wechseln!", errSave: "Fehler beim Speichern: " },
+    fr: { state: "État", alliance: "Alliance", btnClan: "🤝 Chercher dans l'Alliance", btnState: "🌍 Chercher dans l'État", btnGlobal: "🌌 Chercher dans Tous les États", searchPh: "🔍 Chercher...", btnSave: "💾 Sauvegarder", btnLogout: "Déconnexion", backAlbum: "⬅ Retour", backCard: "⬅ Retour", markDone: "✔ Marquer à 1", cardsOwnedInfo: "Cartes complètes", givesYou: "Peut vous donner:", asksFrom: "Vous demande:", traded: "Échangé!", noMatch: "Aucun joueur correspondant.", tradeWarning: "⚠️ Ne cliquez sur 'Échangé' que si l'échange a eu lieu dans le jeu !", videoSearch: "⏳ Recherche...", videoPending: "Téléchargement de la vidéo en cours...", promptName: "Entrez votre nouveau nom de joueur :", promptState: "Entrez votre nouvel État (Serveur) :", promptAlliance: "Entrez votre nouvelle Alliance (exactement 3 caractères) :", errAlliance: "Le tag de l'alliance doit comporter exactement 3 caractères !", errBan: "Vous ne pouvez pas transférer vers ce serveur !", errSave: "Erreur de sauvegarde : " },
+    tr: { state: "Eyalet", alliance: "İttifak", btnClan: "🤝 İttifakta Ara", btnState: "🌍 Eyalette Ara", btnGlobal: "🌌 Tüm Eyaletlerde Ara", searchPh: "🔍 Ara...", btnSave: "💾 Kaydet", btnLogout: "Çıkış Yap", backAlbum: "⬅ Albümlere Dön", backCard: "⬅ Kartlara Dön", markDone: "✔ Eksikleri 1 yap", cardsOwnedInfo: "Tamamlanan kartlar", givesYou: "Sana verebilir:", asksFrom: "Senden istiyor:", traded: "Takas edildi!", noMatch: "Eşleşen oyuncu bulunamadı.", tradeWarning: "⚠️ Yalnızca oyun içinde takas gerçekleştiyse 'Takas edildi!' butonuna tıklayın!", videoSearch: "⏳ Aranıyor...", videoPending: "Video yüklemesi devam ediyor...", promptName: "Yeni oyuncu adınızı girin:", promptState: "Yeni Eyaletinizi (Sunucu) girin:", promptAlliance: "Yeni İttifak etiketinizi girin (tam olarak 3 karakter):", errAlliance: "İttifak etiketi tam olarak 3 karakter olmalıdır!", errBan: "Bu sunucuya geçiş yapamazsınız!", errSave: "Kaydetme hatası: " },
+    hu: { state: "Állam", alliance: "Szövetség", btnClan: "🤝 Keresés Szövetségben", btnState: "🌍 Keresés Államban", btnGlobal: "🌌 Keresés Minden Államban", searchPh: "🔍 Keresés albumra vagy kártyára...", btnSave: "💾 Változások Mentése", btnLogout: "Kijelentkezés", backAlbum: "⬅ Vissza az Albumokhoz", backCard: "⬅ Vissza a Kártyákhoz", markDone: "✔ Hiányzók 1-re állítása", cardsOwnedInfo: "Ezek a kártyák megvannak", givesYou: "Tud adni neked:", asksFrom: "Kéri tőled:", traded: "Elcseréltük!", noMatch: "Nincs találat a cserepartnerekre.", tradeWarning: "⚠️ Csak akkor kattints a 'Traded!' gombra, ha a játékban is megtörtént a csere!", videoSearch: "⏳ Keresés...", videoPending: "A videó feltöltése folyamatban...", promptName: "Add meg az új játékosneved:", promptState: "Írd be az új Államot (State/Server):", promptAlliance: "Írd be az új Szövetséget (pontosan 3 betű):", errAlliance: "A szövetség nevének pontosan 3 karakternek kell lennie!", errBan: "Erre a szerverre nem válthatsz hozzáférési hiba miatt!", errSave: "Hiba mentés közben: " },
+    ru: { state: "Штат", alliance: "Альянс", btnClan: "🤝 Поиск в альянсе", btnState: "🌍 Поиск в штате", btnGlobal: "🌌 Поиск во всех штатах", searchPh: "🔍 Поиск...", btnSave: "💾 Сохранить", btnLogout: "Выйти", backAlbum: "⬅ Назад", backCard: "⬅ Назад", markDone: "✔ На 1", cardsOwnedInfo: "Собранные карты", givesYou: "Может дать вам:", asksFrom: "Просит у вас:", traded: "Обменялись!", noMatch: "Игроков не найдено.", tradeWarning: "⚠️ Нажимайте 'Обменялись!' только если обмен уже произошел в игре!", videoSearch: "⏳ Поиск...", videoPending: "Идет загрузка видео...", promptName: "Введите новое имя игрока:", promptState: "Введите новый штат (сервер):", promptAlliance: "Введите новый тег альянса (ровно 3 символа):", errAlliance: "Тег альянса должен состоять ровно из 3 символов!", errBan: "Вы не можете перейти на этот сервер!", errSave: "Ошибка сохранения: " },
+    ar: { state: "حالة", alliance: "تحالف", btnClan: "🤝 البحث في التحالف", btnState: "🌍 البحث في الولاية", btnGlobal: "🌌 البحث في كل الولايات", searchPh: "🔍 البحث...", btnSave: "💾 حفظ التغييرات", btnLogout: "تسجيل خروج", backAlbum: "⬅ العودة", backCard: "⬅ العودة", markDone: "✔ تعيين إلى 1", cardsOwnedInfo: "بطاقات مكتملة", givesYou: "يمكن أن يعطيك:", asksFrom: "يطلب منك:", traded: "تم التبادل!", noMatch: "لم يتم العثور على لاعبين.", tradeWarning: "⚠️ انقر فقط على 'تم التبادل!' إذا حدث التبادل بالفعل في اللعبة!", videoSearch: "⏳ جاري البحث...", videoPending: "جاري تحميل الفيديو...", promptName: "أدخل اسم اللاعب الجديد الخاص بك:", promptState: "أدخل ولايتك (الخادم) الجديدة:", promptAlliance: "أدخل تحالفك الجديد (3 أحرف بالضبط):", errAlliance: "يجب أن يتكون رمز التحالف من 3 أحرف بالضبط!", errBan: "لا يمكنك الانتقال إلى هذا الخادم!", errSave: "خطأ في الحفظ: " }
+};
         window.currLang = 'en';
 
         // --- AZ ALBUMOK ÉS KÉPEK ---
@@ -584,7 +590,37 @@ document.getElementById('lang-selector').addEventListener('change', (e) => {
         document.getElementById('btn-match-global').addEventListener('click', () => runMatchmaker('global'));
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 document.getElementById('banned-logout-btn').addEventListener('click', () => signOut(auth));
-		
+	
+		// --- PROFIL MENTÉSE (GOOGLE BELÉPÉS UTÁNI ELSŐ HASZNÁLATKOR) ---
+document.getElementById("save-profile-btn").addEventListener("click", async () => {
+    const jatekNev = document.getElementById("player-name").value.trim();
+    const szerver = document.getElementById("server-number").value.trim();
+    const szovetseg = document.getElementById("alliance-name").value.trim().toUpperCase();
+    const errorDiv = document.getElementById("profile-error");
+
+    // --- ÚJ ELLENŐRZÉS: State 3 vagy 4 karakter ---
+    if (!jatekNev || !szerver || szovetseg.length !== 3 || szerver.length < 3 || szerver.length > 4) {
+        errorDiv.innerText = "Please fill all fields correctly (State = 3 or 4 digits, Alliance = 3 chars)";
+        return;
+    }
+
+    try {
+        await setDoc(doc(db, "jatekosok", window.currentUserUid), {
+            jatekNev,
+            szerver,
+            szovetseg
+        }, { merge: true });
+
+        if (szerver === "2243" || szerver === 2243) {
+            showScreen(document.getElementById("banned-screen"));
+            return;
+        }
+
+        checkUserProfile(window.currentUserUid);
+    } catch (err) {
+        errorDiv.innerText = err.message;
+    }
+});
 
             // Segédfüggvény a keresőből történő azonnali módosításhoz
         window.searchUpdateQty = function(pieceId, change, elementId) {
@@ -739,19 +775,20 @@ function showScreen(screen) {
             showScreen(authScreen);
         });
 
-        // A tényleges regisztráció lebonyolítása mindennel együtt
-        document.getElementById('do-register-btn').addEventListener('click', async () => {
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value;
-            const pName = document.getElementById('reg-player-name').value.trim();
-           const pServer = document.getElementById('reg-server-number').value.trim();
-            const pAlliance = document.getElementById('reg-alliance-name').value.trim().toUpperCase();
-            const errorDiv = document.getElementById('reg-error');
+// A tényleges regisztráció lebonyolítása mindennel együtt
+        document.getElementById('do-register-btn').addEventListener('click', async () => {
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const pName = document.getElementById('reg-player-name').value.trim();
+            const pServer = document.getElementById('reg-server-number').value.trim();
+            const pAlliance = document.getElementById('reg-alliance-name').value.trim().toUpperCase();
+            const errorDiv = document.getElementById('reg-error');
 
-            if (!email || !password || !pName || !pServer || pAlliance.length !== 3) {
-                errorDiv.textContent = "Please fill in all fields correctly (Alliance exactly 3 chars).";
-                return;
-            }
+            // --- JAVÍTOTT IF: State (pServer) 3 vagy 4 karakter ---
+            if (!email || !password || !pName || !pServer || pAlliance.length !== 3 || pServer.length < 3 || pServer.length > 4) {
+                errorDiv.textContent = "Please fill all fields correctly (State = 3 or 4 digits, Alliance = 3 chars).";
+                return;
+            }
 
             try {
                 // 1. Fiók létrehozása
@@ -1385,61 +1422,159 @@ function updateQty(pieceId, change) {
             modal.classList.remove('show');
         });
 
-		// --- PROFIL MENTÉSE ÉS TOVÁBBLÉPÉS JAVÍTÁS ---
-		
-document.getElementById("save-profile-btn").addEventListener("click", async () => {
-  const jatekNev = document.getElementById("player-name").value.trim();
-  const szerver = document.getElementById("server-number").value.trim();
-  const szovetseg = document.getElementById("alliance-name").value.trim().toUpperCase();
+// =========================================================================
+// --- ÚJ, ELEGÁNS FELUGRÓ ABLAK (MODAL) RENDSZER ---
+// =========================================================================
 
-  if (!jatekNev || !szerver || szovetseg.length !== 3) {
-    document.getElementById("profile-error").innerText =
-      "Please fill all fields correctly (Alliance = 3 chars)";
-    return;
-  }
+// Ez a függvény legenerálja a szép, egyedi adatbekérő ablakot
+function showCustomModal(title, fields, langData) {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'video-modal show'; 
+        modal.style.display = 'flex'; 
+        
+        let inputsHtml = '';
+        fields.forEach(f => {
+            inputsHtml += `<label style="color:#ccc; font-size:13px; margin-bottom:5px; display:block;">${f.label}</label>
+                           <input type="${f.type || 'text'}" id="modal-input-${f.id}" value="${f.value}" style="width:100%; margin-top:0; margin-bottom:15px; background: rgba(0,0,0,0.5); color: white; border: 1px solid #e09f3e;">`;
+        });
 
-  try {
-    await setDoc(doc(db, "jatekosok", currentUserUid), {
-      jatekNev,
-      szerver,
-      szovetseg
-    }, { merge: true });
-// --- ÚJ: 2243 ellenőrzés közvetlenül profil mentés után ---
-    if (szerver === "2243" || szerver === 2243) {
-        showScreen(document.getElementById("banned-screen"));
+        const cancelTxt = window.currLang === 'hu' ? 'Mégsem' : (window.currLang === 'de' ? 'Abbrechen' : (window.currLang === 'fr' ? 'Annuler' : 'Cancel'));
+
+        modal.innerHTML = `
+            <div class="video-modal-content" style="background: rgba(25, 35, 50, 0.95); padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="color: #e09f3e; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">${title}</h3>
+                ${inputsHtml}
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button id="modal-cancel" class="btn btn-back" style="flex: 1; margin: 0; text-align: center;">${cancelTxt}</button>
+                    <button id="modal-save" class="btn btn-green" style="flex: 1; margin: 0;">✔ OK</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Fókusz az első mezőre
+        if(fields.length > 0) document.getElementById(`modal-input-${fields[0].id}`).focus();
+
+        // Ha rányom a Mégsem-re
+        document.getElementById('modal-cancel').addEventListener('click', () => {
+            modal.remove();
+            resolve(null);
+        });
+        
+        // Ha rányom a Mentésre
+        document.getElementById('modal-save').addEventListener('click', () => {
+            const results = {};
+            fields.forEach(f => { results[f.id] = document.getElementById(`modal-input-${f.id}`).value.trim(); });
+            modal.remove();
+            resolve(results);
+        });
+    });
+}
+
+// Egyedi Hiba/Figyelmeztető ablak
+function showCustomAlert(message) {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'video-modal show';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="video-modal-content" style="background: rgba(25, 35, 50, 0.95); padding: 25px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; border: 1px solid #ff6b6b; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+                <h3 style="color: #ff6b6b; margin-top: 0; font-size: 30px;">⚠️</h3>
+                <p style="color: white; margin-bottom: 20px; font-size: 16px;">${message}</p>
+                <button id="modal-ok" class="btn btn-blue" style="width: 100%; margin: 0;">OK</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById('modal-ok').addEventListener('click', () => { modal.remove(); resolve(); });
+    });
+}
+
+// =========================================================================
+// --- KATTINTÁS A NÉVRE ÉS FÖLDGÖMBRE (MODAL HASZNÁLATÁVAL) ---
+// =========================================================================
+
+// Névváltoztatás
+document.getElementById('edit-name-btn').addEventListener('click', async () => {
+    const langData = i18n[window.currLang] || i18n['en'];
+    const currentNameNode = document.getElementById('display-name').childNodes[0];
+    const currentName = currentNameNode ? currentNameNode.nodeValue.trim() : "";
+    
+    // Itt hívjuk meg a szép ablakot!
+    const result = await showCustomModal("✏️ Edit Profile", [
+        { id: "newName", label: langData.promptName, value: currentName }
+    ], langData);
+
+    if (!result || !result.newName || result.newName === currentName) return; 
+
+    try {
+        await updateDoc(doc(db, "jatekosok", window.currentUserUid), { jatekNev: result.newName });
+        checkUserProfile(window.currentUserUid);
+        
+        const toast = document.getElementById('toast-msg');
+        toast.textContent = "✅ Saved!";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2000);
+    } catch (error) {
+        await showCustomAlert(langData.errSave + error.message);
+    }
+});
+
+// Transfer (Állam és Szövetség)
+// --- KATTINTÁS A FÖLDGÖMBRE: TRANSFER (Állam és Szövetség váltás) ---
+document.getElementById('transfer-server-btn').addEventListener('click', async () => {
+    const langData = i18n[window.currLang] || i18n['en'];
+    const currentServer = document.getElementById('display-server').textContent;
+    const currentAlliance = document.getElementById('display-alliance').textContent;
+
+    // Itt két mezőt kérünk be a szép ablakkal!
+    const result = await showCustomModal("🌍 Transfer", [
+        { id: "newState", label: langData.promptState, value: currentServer, type: "number" },
+        { id: "newAlliance", label: langData.promptAlliance, value: currentAlliance }
+    ], langData);
+
+    if (!result) return; // Rányomott a Mégsem-re
+
+    const newServer = result.newState.trim();
+    const formattedAlliance = result.newAlliance.trim().toUpperCase();
+
+    // --- ÚJ VALIDÁCIÓ: Állam hossza pontosan 3 vagy 4 számjegy ---
+    if (newServer.length < 3 || newServer.length > 4) {
+        const errStateMsg = window.currLang === 'hu' ? "Az Állam (State) számának pontosan 3 vagy 4 számjegyből kell állnia!" : "State must be exactly 3 or 4 digits!";
+        await showCustomAlert(errStateMsg);
         return;
     }
-    document.getElementById("profile-setup-screen").style.display = "none";
-    document.getElementById("main-app-screen").style.display = "block";
 
-    document.getElementById("display-name").innerText = jatekNev;
-    document.getElementById("display-server").innerText = szerver;
-    document.getElementById("display-alliance").innerText = szovetseg;
+    if (formattedAlliance.length !== 3) {
+        await showCustomAlert(langData.errAlliance);
+        return;
+    }
 
-  } catch (err) {
-    document.getElementById("profile-error").innerText = err.message;
-  }
+    if (newServer === "2243" || newServer === 2243) {
+        await showCustomAlert(langData.errBan);
+        return;
+    }
+
+    try {
+        await updateDoc(doc(db, "jatekosok", window.currentUserUid), {
+            szerver: newServer,
+            szovetseg: formattedAlliance
+        });
+        
+        checkUserProfile(window.currentUserUid);
+        
+        const toast = document.getElementById('toast-msg');
+        toast.textContent = "✅ Transfer Complete!";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2000);
+        
+        if (typeof updateTradeBadges === 'function') updateTradeBadges();
+    } catch (error) {
+        await showCustomAlert(langData.errSave + error.message);
+    }
 });
     </script>
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
